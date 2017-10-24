@@ -8,18 +8,9 @@ if [ "$#" -ne 1 ] ; then
   exit 0
 fi
 
-name="`basename $1 .vsl`"
+name="`dirname $1`/`basename $1 .vsl`"
 
 # translating from VSL to LLVM IR (.ll)
 java -jar build/libs/TP2.jar < $name.vsl > $name.ll
-
-# # translating from LLVM IR to LLVM bitcode (.bc)
-# llvm-as $name.ll
-
-# # translating from LLVM bitcode to object code for the local architecture (.o)
-# llc -filetype=obj $name.bc
-
-# # call to linker (through clang), producing an executable binary
-# clang $name.o -o $name
 
 clang $name.ll -o $name

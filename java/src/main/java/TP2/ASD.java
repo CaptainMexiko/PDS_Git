@@ -100,6 +100,135 @@ public class ASD {
     }
   }
 
+  static public class MoinsExpression extends Expression {
+    Expression left;
+    Expression right;
+
+    public MoinsExpression(Expression left, Expression right) {
+      this.left = left;
+      this.right = right;
+    }
+
+    // Pretty-printer
+    public String pp() {
+      return "(" + left.pp() + " - " + right.pp() + ")";
+    }
+
+    // IR generation
+    public RetExpression toIR() throws TypeException {
+      RetExpression leftRet = left.toIR();
+      RetExpression rightRet = right.toIR();
+
+      // We check if the types mismatches
+      if(!leftRet.type.equals(rightRet.type)) {
+        throw new TypeException("type mismatch: have " + leftRet.type + " and " + rightRet.type);
+      }
+
+      // We base our build on the left generated IR:
+      // append right code
+      leftRet.ir.append(rightRet.ir);
+
+      // allocate a new identifier for the result
+      String result = Utils.newtmp();
+
+      // new add instruction result = left + right
+      Llvm.Instruction moins = new Llvm.Moins(leftRet.type.toLlvmType(), leftRet.result, rightRet.result, result);
+
+      // append this instruction
+      leftRet.ir.appendCode(moins);
+
+      // return the generated IR, plus the type of this expression
+      // and where to find its result
+      return new RetExpression(leftRet.ir, leftRet.type, result);
+    }
+  }
+
+  static public class MultExpression extends Expression {
+    Expression left;
+    Expression right;
+
+    public MultExpression(Expression left, Expression right) {
+      this.left = left;
+      this.right = right;
+    }
+
+    // Pretty-printer
+    public String pp() {
+      return "(" + left.pp() + " * " + right.pp() + ")";
+    }
+
+    // IR generation
+    public RetExpression toIR() throws TypeException {
+      RetExpression leftRet = left.toIR();
+      RetExpression rightRet = right.toIR();
+
+      // We check if the types mismatches
+      if(!leftRet.type.equals(rightRet.type)) {
+        throw new TypeException("type mismatch: have " + leftRet.type + " and " + rightRet.type);
+      }
+
+      // We base our build on the left generated IR:
+      // append right code
+      leftRet.ir.append(rightRet.ir);
+
+      // allocate a new identifier for the result
+      String result = Utils.newtmp();
+
+      // new add instruction result = left + right
+      Llvm.Instruction mult = new Llvm.Mult(leftRet.type.toLlvmType(), leftRet.result, rightRet.result, result);
+
+      // append this instruction
+      leftRet.ir.appendCode(mult);
+
+      // return the generated IR, plus the type of this expression
+      // and where to find its result
+      return new RetExpression(leftRet.ir, leftRet.type, result);
+    }
+  }
+
+  static public class DivExpression extends Expression {
+    Expression left;
+    Expression right;
+
+    public DivExpression(Expression left, Expression right) {
+      this.left = left;
+      this.right = right;
+    }
+
+    // Pretty-printer
+    public String pp() {
+      return "(" + left.pp() + " / " + right.pp() + ")";
+    }
+
+    // IR generation
+    public RetExpression toIR() throws TypeException {
+      RetExpression leftRet = left.toIR();
+      RetExpression rightRet = right.toIR();
+
+      // We check if the types mismatches
+      if(!leftRet.type.equals(rightRet.type)) {
+        throw new TypeException("type mismatch: have " + leftRet.type + " and " + rightRet.type);
+      }
+
+      // We base our build on the left generated IR:
+      // append right code
+      leftRet.ir.append(rightRet.ir);
+
+      // allocate a new identifier for the result
+      String result = Utils.newtmp();
+
+      // new add instruction result = left + right
+      Llvm.Instruction div = new Llvm.Div(leftRet.type.toLlvmType(), leftRet.result, rightRet.result, result);
+
+      // append this instruction
+      leftRet.ir.appendCode(div);
+
+      // return the generated IR, plus the type of this expression
+      // and where to find its result
+      return new RetExpression(leftRet.ir, leftRet.type, result);
+    }
+  }
+
   // Concrete class for Expression: constant (integer) case
   static public class IntegerExpression extends Expression {
     int value;
