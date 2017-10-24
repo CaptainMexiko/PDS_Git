@@ -20,17 +20,20 @@ program returns [ASD.Program out]
     ;
 
 expression returns [ASD.Expression out]
-    : LP l=factor PLUS r=expression { $out = new ASD.AddExpression($l.out, $r.out); } RP
-    | LP l=factor MOINS r=expression { $out = new ASD.MoinsExpression($l.out, $r.out); } RP
-    | LP l=factor MULT r=expression { $out = new ASD.MultExpression($l.out, $r.out); } RP
-    | LP l=factor DIV r=expression { $out = new ASD.DivExpression($l.out, $r.out); } RP
-    | l=factor PLUS r=expression  { $out = new ASD.AddExpression($l.out, $r.out); }
+    : l=factor PLUS r=expression  { $out = new ASD.AddExpression($l.out, $r.out); }
     | l=factor MOINS r=expression  { $out = new ASD.MoinsExpression($l.out, $r.out); }
     | l=factor MULT r=expression  { $out = new ASD.MultExpression($l.out, $r.out); }
     | l=factor DIV r=expression  { $out = new ASD.DivExpression($l.out, $r.out); }
     | f=factor { $out = $f.out; }
     // TODO : that's all?
     ;
+
+expressionparanthese returns [ASD.Expression out]
+  : LP l=factor PLUS r=expression { $out = new ASD.AddExpression($l.out, $r.out); }
+  | LP l=factor MOINS r=expression  { $out = new ASD.MoinsExpression($l.out, $r.out); }
+  | LP l=factor MULT r=expression  { $out = new ASD.MultExpression($l.out, $r.out); }
+  | LP l=factor DIV r=expression  { $out = new ASD.DivExpression($l.out, $r.out); }
+  | f=factor { $out = $f.out; }
 
 factor returns [ASD.Expression out]
     : p=primary { $out = $p.out; }
