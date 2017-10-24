@@ -16,20 +16,26 @@ options {
 // TODO : other rules
 
 program returns [ASD.Program out]
-    : e=expression { $out = new ASD.Program($e.out); } // TODO : change when you extend the language
+    : e=expressionbasseprio { $out = new ASD.Program($e.out); } // TODO : change when you extend the language
     ;
 
-expression returns [ASD.Expression out]
-  : l=expression MULT r=expression  { $out = new ASD.MultExpression($l.out, $r.out); }
-  | l=expression DIV r=expression  { $out = new ASD.DivExpression($l.out, $r.out); }
-  | l=expression PLUS r=expression  { $out = new ASD.AddExpression($l.out, $r.out); }
-  | l=expression MOINS r=expression  { $out = new ASD.MoinsExpression($l.out, $r.out); }
-  | f=factor { $out = $f.out; }
+expressionbasseprio returns [ASD.Expression out]
+  : l=expressionhauteprio ( PLUS r=expressionbasseprio  { $out = new ASD.AddExpression($l.out, $r.out); }
+                            |MOINS r=expressionbasseprio  { $out = new ASD.MoinsExpression($l.out, $r.out); }
+                            )+
+  | l=expressionhauteprio { $out = $l.out; }
   // TODO : that's all?
   ;
 
+expressionhauteprio returns [ASD.Expression out]
+  : l=factor (MULT r=expressionhauteprio  { $out = new ASD.MultExpression($l.out, $r.out); }
+              |DIV r=expressionhauteprio  { $out = new ASD.DivExpression($l.out, $r.out); }
+              )+
+  | f=factor { $out = $f.out; }
+  ;
 factor returns [ASD.Expression out]
     : p=primary { $out = $p.out; }
+    | LP e=expressionbasseprio RP { $out = $e.out; }
     // TODO : that's all?
     ;
 
