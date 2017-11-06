@@ -66,13 +66,9 @@ public class ASD {
         static public class RetInstruction {
             // The LLVM IR:
             public Llvm.IR ir;
-            // And additional stuff:
-            public String result; // The name containing the expression's result
-            // (either an identifier, or an immediate value)
 
-            public RetInstruction(Llvm.IR ir, String result) {
+            public RetInstruction(Llvm.IR ir) {
                 this.ir = ir;
-                this.result = result;
             }
         }
     }
@@ -302,7 +298,7 @@ public class ASD {
 
         // Pretty-printer
         public String pp() {
-            return "(" + left.pp() + " + " + right.pp() + ")";
+            return "(" + left.pp() + " := " + right.pp() + ")";
         }
 
         // IR generation
@@ -319,18 +315,41 @@ public class ASD {
             // append right code
             leftRet.ir.append(rightRet.ir);
 
-            // allocate a new identifier for the result
-            String result = Utils.newtmp();
-
-            // new add instruction result = left + right
-            Llvm.Instruction add = new Llvm.Add(leftRet.type.toLlvmType(), leftRet.result, rightRet.result, result);
+            // new affect instruction result = affectable := expression
+            Llvm.Instruction affect = new Llvm.Affect(leftRet.result, rightRet.result);
 
             // append this instruction
-            leftRet.ir.appendCode(add);
+            leftRet.ir.appendCode(affect);
 
             // return the generated IR, plus the type of this expression
             // and where to find its result
-            return new RetInstruction(leftRet.ir, result);
+            return new RetInstruction(leftRet.ir);
+        }
+    }
+
+    static public class AffectableConst extends Affectable {
+        Type type;
+        String ident;
+
+        public AffectableConst(Type type, String ident) {
+            this.type = type;
+            this.ident = ident;
+        }
+
+        public String pp() {
+            return "" + ident;
+        }
+
+        Llvm.IR irConst = new Llvm.IR(Llvm.empty(), Llvm.empty());
+
+        Llvm.Instruction constante = new Llvm.Const(type.toLlvmType(), ident);
+
+        irConst.appendCode(constante);
+
+        public RetAffectable toIR() {
+            // Here we simply return an empty IR
+            // the `result' of this expression is the integer itself (as string)
+            return new RetAffectable(irConst, new IntType(), "" + ident);
         }
     }
 

@@ -20,7 +20,7 @@ program returns [ASD.Program out]
     ;
 
 instruction returns [ASD.Instruction out]
-    : a=affectable  AFFECT  e=expressionbasseprio  { $out = new ASD.AffectInstruction($v.out, $e.out); }
+    : a=affectable  AFFECT  e=expressionbasseprio  { $out = new ASD.AffectInstruction($a.out, $e.out); }
     ;
 
 expressionbasseprio returns [ASD.Expression out]
@@ -44,7 +44,7 @@ factor returns [ASD.Expression out]
     ;
 
 affectable returns [ASD.Affectable out]
-  : IDENT { ; $out = new ASD.VariableAffectable($IDENT.string); }
+  : IDENT { $out = new ASD.VariableAffectable($IDENT.type, $IDENT.text); }
   ;
 
 primary returns [ASD.Expression out]

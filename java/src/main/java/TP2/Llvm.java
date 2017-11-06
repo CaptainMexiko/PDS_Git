@@ -176,5 +176,33 @@ public class Llvm {
         }
     }
 
+    static public class Affect extends Instruction {
+      String affectable;
+      String expression;
+
+      public Affect(String affectable, String expression){
+        this.affectable = affectable;
+        this.expression = expression;
+      }
+
+      public String toString() {
+          return " store " + expression + ", " + affectable + "\n";
+      }
+    }
+
+    static public class Const extends Instruction {
+      Type type;
+      String ident;
+
+      public Const(Type type, String ident){
+        this.type = type;
+        this.ident = ident;
+      }
+
+      public String toString() {
+          return  type + "* " + ident + "\n";
+      }
+    }
+
     // TODO : other instructions
 }
