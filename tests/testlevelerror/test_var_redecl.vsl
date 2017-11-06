@@ -1,8 +1,8 @@
 FUNC INT main() {
-  INT i
-  INT i
-  i := 1
-  PRINT i
-  RETURN 0
+INT i
+INT i
+i := 1
+PRINT i
+RETURN 0
 }
 

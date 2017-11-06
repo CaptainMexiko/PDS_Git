@@ -1,11 +1,11 @@
 FUNC VOID f() {
-  INT i
-  i := 2
+INT i
+i := 2
 }
 
 FUNC INT main() {
-  f()
-  PRINT i
-	RETURN 0
+f()
+PRINT i
+RETURN 0
 }
 

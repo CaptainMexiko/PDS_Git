@@ -2,22 +2,22 @@ apply plugin: 'java'
 apply plugin: 'antlr'
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-  antlr 'org.antlr:antlr4:4.7'
+    antlr 'org.antlr:antlr4:4.7'
 }
 
 generateGrammarSource {
-  arguments += ['-no-visitor', '-no-listener']
+    arguments += ['-no-visitor', '-no-listener']
 }
 
 jar {
-  manifest {
-    attributes (
-      'Main-Class': 'TP2.Main',
-      'Class-Path': configurations.runtimeClasspath.files.join(' ')
-    )
-  }
+    manifest {
+        attributes(
+                'Main-Class': 'TP2.Main',
+                'Class-Path': configurations.runtimeClasspath.files.join(' ')
+        )
+    }
 }

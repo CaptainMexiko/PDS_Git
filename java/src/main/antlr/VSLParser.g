@@ -16,7 +16,11 @@ options {
 // TODO : other rules
 
 program returns [ASD.Program out]
-    : e=expressionbasseprio { $out = new ASD.Program($e.out); } // TODO : change when you extend the language
+    : e=expressionbasseprio i=instruction { $out = new ASD.Program($e.out, $i.out); } // TODO : change when you extend the language
+    ;
+
+instruction returns [ASD.Instruction out]
+    : a=affectable  AFFECT  e=expressionbasseprio  { $out = new ASD.AffectInstruction($a.out, $e.out); }
     ;
 
 expressionbasseprio returns [ASD.Expression out]
@@ -38,6 +42,10 @@ factor returns [ASD.Expression out]
     | LP e=expressionbasseprio RP { $out = $e.out; }
     // TODO : that's all?
     ;
+
+affectable returns [ASD.Affectable out]
+  : IDENT { $out = new ASD.VariableAffectable($IDENT.type, $IDENT.text); }
+  ;
 
 primary returns [ASD.Expression out]
     : INTEGER { $out = new ASD.IntegerExpression($INTEGER.int); }

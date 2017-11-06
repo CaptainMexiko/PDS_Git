@@ -1,4 +1,4 @@
 FUNC INT main() {
-            PRINT "Hello World"
-	}
+PRINT "Hello World"
+}
 
