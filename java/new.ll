@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 ; Target
 target triple = "x86_64-unknown-linux-gnu"
 ; External declaration of the printf function
@@ -12,3 +14,4 @@ define i32 @main() {
 ret i32 %tmp1
 }
 
+>>>>>>> bc829177f11cd7a3948daca4e13ae0a898c820ea
