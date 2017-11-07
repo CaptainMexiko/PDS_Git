@@ -216,8 +216,12 @@ public class Llvm {
       }
 
       public String toString() {
-          return "%" + affectable.result + " = alloca " + type + "\n"
-                  + "store " + type + " " + expression.result + ", " + type + "* " + " %" + affectable.result + "\n";
+          String p100 = " ";
+          if (Character.isLetter(expression.result.charAt(0))){
+            p100 = " %";
+          }
+          return  "%" + affectable.result + " = alloca " + type + "\n"
+              + "store " + type + p100 + expression.result + ", " + type + "* " + " %" + affectable.result + "\n";
       }
     }
 

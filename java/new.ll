@@ -12,8 +12,16 @@ define i32 @main() {
 %a = alloca i32
 store i32 3, i32*  %a
 %tmp1 = load i32, i32* %a
-%tmp2 = add i32 %tmp1, 4
+%b = alloca i32
+store i32 %tmp1, i32*  %b
+%tmp2 = load i32, i32* %b
+%tmp3 = load i32, i32* %a
+%tmp4 = add i32 %tmp2, %tmp3
+%c = alloca i32
+store i32 %tmp4, i32*  %c
+%tmp5 = load i32, i32* %a
+%tmp6 = add i32 %tmp5, 4
 ; Fin block 
-ret i32 %tmp2
+ret i32 %tmp6
 }
 
