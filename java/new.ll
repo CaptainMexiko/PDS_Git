@@ -19,7 +19,7 @@ store i32 %tmp1, i32*  %b
 %tmp4 = add i32 %tmp2, %tmp3
 %c = alloca i32
 store i32 %tmp4, i32*  %c
-%tmp5 = load i32, i32* %a
+%tmp5 = load i32, i32* %c
 %tmp6 = add i32 %tmp5, 4
 ; Fin block 
 ret i32 %tmp6
