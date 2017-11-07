@@ -23,6 +23,11 @@ public class ASD {
 
             // computes the IR of the expression
             Block.RetBlock retBlock = bprincipale.toIR();
+
+            Llvm.Instruction ret = new Llvm.Return(retBlock.type.toLlvmType(), retBlock.value);
+
+            retBlock.ir.appendCode(ret);
+
             return retBlock.ir;
         }
     }
@@ -38,18 +43,21 @@ public class ASD {
         static public class RetBlock{
             // The LLVM IR:
             public Llvm.IR ir;
+            Type type;
+            String value;
 
-
-            public RetBlock(Llvm.IR ir) {
+            public RetBlock(Llvm.IR ir, Type type, String value) {
                 this.ir = ir;
+                this.type = type;
+                this.value = value;
             }
         }
     }
 
     static public class BlockImplement extends Block {
-        List<Statement> lStatement = new ArrayList<>();
+        List<StatementImplement> lStatement = new ArrayList<>();
 
-        public BlockImplement(List<Statement> lStatement) {
+        public BlockImplement(List<StatementImplement> lStatement) {
             this.lStatement = lStatement;
         }
 
@@ -69,15 +77,23 @@ public class ASD {
          Llvm.Instruction commmentBlockD = new Llvm.Comment("Début block ");
          irBlock.appendCode(commmentBlockD);
 
-         for (Statement e : lStatement) {
-          Statement.RetStatement reStat = e.toIR();
+         String lastExprRes = "0";
+         Type lastTypeRes = new IntType();
+
+         for (StatementImplement si : lStatement) {
+
+          Statement.RetStatement reStat = si.toIR();
           irBlock.append(reStat.ir);
+          if(si.e != null){
+          lastExprRes = reStat.result;
+          lastTypeRes = reStat.type;
+          }
          }
 
          Llvm.Instruction commmentBlockf = new Llvm.Comment("Fin block ");
          irBlock.appendCode(commmentBlockf);
 
-         return new RetBlock(irBlock);
+         return new RetBlock(irBlock, lastTypeRes, lastExprRes);
         }
     }
 
@@ -97,8 +113,10 @@ public class ASD {
           public String result; // The name containing the expression's result
           // (either an identifier, or an immediate value)
 
-          public RetStatement(Llvm.IR ir) {
+          public RetStatement(Llvm.IR ir, Type type, String result) {
               this.ir = ir;
+              this.type = type;
+              this.result = result;
           }
         }
       }
@@ -132,11 +150,11 @@ public class ASD {
         RetStatement rep = null;
         if(e != null){
           Expression.RetExpression retExpr = e.toIR();
-          rep =  new RetStatement(retExpr.ir);
+          rep =  new RetStatement(retExpr.ir, retExpr.type, retExpr.result);
         }
         if(i != null){
           Instruction.RetInstruction retInstr = i.toIR();
-          rep =  new RetStatement(retInstr.ir);
+          rep =  new RetStatement(retInstr.ir, null, null);
         }
         return rep;
       }
@@ -377,6 +395,39 @@ public class ASD {
         }
     }
 
+    static public class ExprIdent extends Expression {
+        Type type;
+        String ident;
+
+        public ExprIdent(Type type, String ident) {
+            this.type = type;
+            this.ident = ident;
+        }
+
+        // Pretty-printer
+        public String pp() {
+            return "(" + ident + ")";
+        }
+
+        // IR generation
+        public RetExpression toIR() throws TypeException {
+
+            Llvm.IR irRE = new Llvm.IR(Llvm.empty(), Llvm.empty());
+
+            String result = Utils.newtmp();
+
+            // new add instruction result = left + right
+            Llvm.Instruction exprIdent = new Llvm.ExprIdent(type.toLlvmType(), ident, result);
+
+            // append this instruction
+            irRE.appendCode(exprIdent);
+
+            // return the generated IR, plus the type of this expression
+            // and where to find its result
+            return new RetExpression(irRE, type, result);
+        }
+    }
+
     // Concrete class for Expression: constant (integer) case
     static public class IntegerExpression extends Expression {
         int value;
@@ -425,7 +476,7 @@ public class ASD {
             leftRet.ir.append(rightRet.ir);
 
             // new affect instruction result = affectable := expression
-            Llvm.Instruction affect = new Llvm.Affect(leftRet.type.toLlvmType(),leftRet, rightRet);
+            Llvm.Instruction affect = new Llvm.AffectExpression(leftRet.type.toLlvmType(),leftRet, rightRet);
 
             // append this instruction
             leftRet.ir.appendCode(affect);

@@ -20,7 +20,7 @@ program returns [ASD.Program out]
     ;
 
 bloc returns [ASD.BlockImplement out]
-  : {List<ASD.Statement> ls = new ArrayList(); } (s=statement {ls.add($s.out);} )+ { $out = new ASD.BlockImplement(ls); }
+  : {List<ASD.StatementImplement> ls = new ArrayList(); } (s=statement {ls.add($s.out);} )+ { $out = new ASD.BlockImplement(ls); }
   ;
 
 statement returns [ASD.StatementImplement out]
@@ -29,7 +29,7 @@ statement returns [ASD.StatementImplement out]
   ;
 
 instruction returns [ASD.Instruction out]
-    : a=affectableconst  AFFECT  e=expressionbasseprio  { $out = new ASD.AffectInstruction($a.out, $e.out); }
+    : a=affectable  AFFECT  e=expressionbasseprio  { $out = new ASD.AffectInstruction($a.out, $e.out); }
     ;
 
 expressionbasseprio returns [ASD.Expression out]
@@ -52,11 +52,12 @@ factor returns [ASD.Expression out]
     // TODO : that's all?
     ;
 
-affectableconst returns [ASD.Affectable out]
+affectable returns [ASD.Affectable out]
   : IDENT { $out = new ASD.AffectableConst(new ASD.IntType(), $IDENT.text); }
   ;
 
 primary returns [ASD.Expression out]
     : INTEGER { $out = new ASD.IntegerExpression($INTEGER.int); }
+    | IDENT { $out = new ASD.ExprIdent(new ASD.IntType(), $IDENT.text); }
     // TODO : that's all?
     ;

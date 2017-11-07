@@ -52,14 +52,14 @@ public class Llvm {
 
             // We create the function main
             // TODO : remove this when you extend the language
-            //r.append("define i32 @main() {\n");
+            r.append("define i32 @main() {\n");
 
 
             for (Instruction inst : code)
                 r.append(inst);
 
             // TODO : remove this when you extend the language
-            //r.append("}\n");
+            r.append("}\n");
 
             return r.toString();
         }
@@ -188,12 +188,28 @@ public class Llvm {
         }
     }
 
-    static public class Affect extends Instruction {
+    static public class ExprIdent extends Instruction {
+        Type type;
+        String exprIdent;
+        String result;
+
+        public ExprIdent(Type type, String exprIdent, String result) {
+            this.type = type;
+            this.exprIdent = exprIdent;
+            this.result = result;
+        }
+
+        public String toString() {
+            return result + " = load " + type + ", " + type + "* " + "%" + exprIdent + "\n";
+        }
+    }
+
+    static public class AffectExpression extends Instruction {
       Type type;
       ASD.AffectableConst.RetAffectable affectable;
       ASD.Expression.RetExpression expression;
 
-      public Affect(Type type, ASD.AffectableConst.RetAffectable affectable, ASD.Expression.RetExpression expression){
+      public AffectExpression(Type type, ASD.AffectableConst.RetAffectable affectable, ASD.Expression.RetExpression expression){
         this.type = type;
         this.affectable = affectable;
         this.expression = expression;
