@@ -52,14 +52,14 @@ public class Llvm {
 
             // We create the function main
             // TODO : remove this when you extend the language
-            r.append("define i32 @main() {\n");
+            //r.append("define i32 @main() {\n");
 
 
             for (Instruction inst : code)
                 r.append(inst);
 
             // TODO : remove this when you extend the language
-            r.append("}\n");
+            //r.append("}\n");
 
             return r.toString();
         }
@@ -88,6 +88,18 @@ public class Llvm {
     // LLVM IR Instructions
     static public abstract class Instruction {
         public abstract String toString();
+    }
+
+    static public class Comment extends Instruction {
+        String lvalue;
+
+        public Comment(String lvalue) {
+            this.lvalue = lvalue;
+        }
+
+        public String toString() {
+            return "; " + lvalue + "\n";
+        }
     }
 
     static public class Add extends Instruction {

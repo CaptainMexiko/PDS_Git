@@ -6,17 +6,15 @@ import java.util.stream.Collectors;
 
 public class ASD {
     static public class Program {
+        BlockImplement bprincipale;
         SymbolTable symbolTable = new SymbolTable();
-        Expression e; // What a program contains. TODO : change when you extend the language
-        Instruction i;
-        public Program(Expression e, Instruction i) {
-            this.e = e;
-            this.i = i;
+        public Program(BlockImplement bprincipale) {
+            this.bprincipale = bprincipale;
         }
 
         // Pretty-printer
         public String pp() {
-            return e.pp();
+            return bprincipale.pp();
         }
 
         // IR generation
@@ -24,23 +22,130 @@ public class ASD {
             // TODO : change when you extend the language
 
             // computes the IR of the expression
-            Expression.RetExpression retExpr = e.toIR();
-            Instruction.RetInstruction retInstr = i.toIR();
-
-            retInstr.ir.append(retExpr.ir);
-
-            // add a return instruction
-            Llvm.Instruction ret = new Llvm.Return(retExpr.type.toLlvmType(), retExpr.result);
-            retInstr.ir.appendCode(ret);
-
-            return retInstr.ir;
+            Block.RetBlock retBlock = bprincipale.toIR();
+            return retBlock.ir;
         }
+    }
+
+    static public abstract class Block{
+        List<Statement> corpBlock = new ArrayList<>();
+
+        public abstract String pp();
+
+        public abstract RetBlock toIR() throws TypeException;
+
+        // Object returned by toIR on expressions, with IR + synthesized attributes
+        static public class RetBlock{
+            // The LLVM IR:
+            public Llvm.IR ir;
+
+
+            public RetBlock(Llvm.IR ir) {
+                this.ir = ir;
+            }
+        }
+    }
+
+    static public class BlockImplement extends Block {
+        List<Statement> lStatement = new ArrayList<>();
+
+        public BlockImplement(List<Statement> lStatement) {
+            this.lStatement = lStatement;
+        }
+
+        // Pretty-printer
+        public String pp() {
+          String str = "";
+          for (Statement e : lStatement) {
+            str = str + e.toString();
+          }
+          return str;
+        }
+
+        // IR generation
+        public RetBlock toIR() throws TypeException {
+         Llvm.IR irBlock = new  Llvm.IR(Llvm.empty(), Llvm.empty());
+
+         Llvm.Instruction commmentBlockD = new Llvm.Comment("Début block ");
+         irBlock.appendCode(commmentBlockD);
+
+         for (Statement e : lStatement) {
+          Statement.RetStatement reStat = e.toIR();
+          irBlock.append(reStat.ir);
+         }
+
+         Llvm.Instruction commmentBlockf = new Llvm.Comment("Fin block ");
+         irBlock.appendCode(commmentBlockf);
+
+         return new RetBlock(irBlock);
+        }
+    }
+
+
+    static public abstract class Statement{
+
+      public abstract String pp();
+
+      public abstract RetStatement toIR() throws TypeException;
+
+      // Object returned by toIR on expressions, with IR + synthesized attributes
+      static public class RetStatement {
+          // The LLVM IR:
+          public Llvm.IR ir;
+          // And additional stuff:
+          public Type type; // The type of the expression
+          public String result; // The name containing the expression's result
+          // (either an identifier, or an immediate value)
+
+          public RetStatement(Llvm.IR ir) {
+              this.ir = ir;
+          }
+        }
+      }
+
+    static public class StatementImplement extends Statement{
+      private Expression e = null;
+      private Instruction i = null;
+
+      public StatementImplement (Expression expression) {
+          this.e = expression;
+      }
+
+      public StatementImplement (Instruction instruction){
+        this.i = instruction;
+      }
+
+      // Pretty-printer
+      public String pp() {
+        String str = "";
+          if (e != null){
+            str =  e.pp();
+          }
+          else if (i != null){
+            str = i.pp();
+          }
+          return str;
+      }
+
+      // IR generation
+      public RetStatement toIR() throws TypeException {
+        RetStatement rep = null;
+        if(e != null){
+          Expression.RetExpression retExpr = e.toIR();
+          rep =  new RetStatement(retExpr.ir);
+        }
+        if(i != null){
+          Instruction.RetInstruction retInstr = i.toIR();
+          rep =  new RetStatement(retInstr.ir);
+        }
+        return rep;
+      }
     }
 
     // All toIR methods returns the IR, plus extra information (synthesized attributes)
     // They can take extra arguments (inherited attributes)
 
-    static public abstract class Expression {
+    static public abstract class Expression{
         public abstract String pp();
 
         public abstract RetExpression toIR() throws TypeException;
@@ -62,7 +167,7 @@ public class ASD {
         }
     }
 
-    static public abstract class Instruction {
+    static public abstract class Instruction{
         public abstract String pp();
 
         public abstract RetInstruction toIR() throws TypeException;
@@ -77,7 +182,7 @@ public class ASD {
         }
     }
 
-    static public abstract class Affectable {
+    static public abstract class Affectable{
         public abstract String pp();
 
         public abstract RetAffectable toIR() throws TypeException;
@@ -378,4 +483,4 @@ public class ASD {
             return new Llvm.IntType();
         }
     }
-}
+  }

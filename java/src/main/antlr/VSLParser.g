@@ -19,8 +19,13 @@ program returns [ASD.Program out]
     : b=bloc { $out = new ASD.Program($b.out); } // TODO : change when you extend the language
     ;
 
-bloc returns [ASD.Bloc out]
-  : {List<ASD.Statement> ls = new ArrayList(); } (s=statement {ls.add($s);} )* { $out = new ASD.Bloc(ls); }
+bloc returns [ASD.BlockImplement out]
+  : {List<ASD.Statement> ls = new ArrayList(); } (s=statement {ls.add($s.out);} )+ { $out = new ASD.BlockImplement(ls); }
+  ;
+
+statement returns [ASD.StatementImplement out]
+  : i=instruction { $out = new ASD.StatementImplement($i.out); }
+    | e=expressionbasseprio { $out = new ASD.StatementImplement($e.out); }
   ;
 
 instruction returns [ASD.Instruction out]
