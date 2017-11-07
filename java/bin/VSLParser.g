@@ -58,6 +58,6 @@ affectable returns [ASD.Affectable out]
 
 primary returns [ASD.Expression out]
     : INTEGER { $out = new ASD.IntegerExpression($INTEGER.int); }
-    | IDENT { $out = new ASD.ExprIdent($IDENT.text); }
+    | IDENT { $out = new ASD.ExprIdent(new ASD.IntType(), $IDENT.text); }
     // TODO : that's all?
     ;
