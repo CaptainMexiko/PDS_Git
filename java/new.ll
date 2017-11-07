@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 ; Target
 target triple = "x86_64-unknown-linux-gnu"
 ; External declaration of the printf function
@@ -10,8 +8,8 @@ declare i32 @printf(i8* noalias nocapture, ...)
 
 
 define i32 @main() {
-%tmp1 = add i32 2, 2
-ret i32 %tmp1
+%a = alloca i32
+store i32 3, i32*  %a
+ret i32 1
 }
 
->>>>>>> bc829177f11cd7a3948daca4e13ae0a898c820ea

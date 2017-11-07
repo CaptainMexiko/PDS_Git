@@ -25,11 +25,15 @@ public class ASD {
 
             // computes the IR of the expression
             Expression.RetExpression retExpr = e.toIR();
+            Instruction.RetInstruction retInstr = i.toIR();
+
+            retInstr.ir.append(retExpr.ir);
+
             // add a return instruction
             Llvm.Instruction ret = new Llvm.Return(retExpr.type.toLlvmType(), retExpr.result);
-            retExpr.ir.appendCode(ret);
+            retInstr.ir.appendCode(ret);
 
-            return retExpr.ir;
+            return retInstr.ir;
         }
     }
 
@@ -316,7 +320,7 @@ public class ASD {
             leftRet.ir.append(rightRet.ir);
 
             // new affect instruction result = affectable := expression
-            Llvm.Instruction affect = new Llvm.Affect(leftRet.result, rightRet.result);
+            Llvm.Instruction affect = new Llvm.Affect(leftRet.type.toLlvmType(),leftRet, rightRet);
 
             // append this instruction
             leftRet.ir.appendCode(affect);
@@ -340,16 +344,16 @@ public class ASD {
             return "" + ident;
         }
 
-        Llvm.IR irConst = new Llvm.IR(Llvm.empty(), Llvm.empty());
-
-        Llvm.Instruction constante = new Llvm.Const(type.toLlvmType(), ident);
-
-        irConst.appendCode(constante);
 
         public RetAffectable toIR() {
-            // Here we simply return an empty IR
-            // the `result' of this expression is the integer itself (as string)
-            return new RetAffectable(irConst, new IntType(), "" + ident);
+
+          Llvm.IR irConst = new Llvm.IR(Llvm.empty(), Llvm.empty());
+
+          Llvm.Instruction constante = new Llvm.Const(type.toLlvmType(), ident);
+
+          irConst.appendCode(constante);
+
+            return new RetAffectable(irConst, type, "" + ident);
         }
     }
 

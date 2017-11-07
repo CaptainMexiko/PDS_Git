@@ -177,16 +177,19 @@ public class Llvm {
     }
 
     static public class Affect extends Instruction {
-      String affectable;
-      String expression;
+      Type type;
+      ASD.AffectableConst.RetAffectable affectable;
+      ASD.Expression.RetExpression expression;
 
-      public Affect(String affectable, String expression){
+      public Affect(Type type, ASD.AffectableConst.RetAffectable affectable, ASD.Expression.RetExpression expression){
+        this.type = type;
         this.affectable = affectable;
         this.expression = expression;
       }
 
       public String toString() {
-          return " store " + expression + ", " + affectable + "\n";
+          return "%" + affectable.result + " = alloca " + type + "\n"
+                  + "store " + type + " " + expression.result + ", " + type + "* " + " %" + affectable.result + "\n";
       }
     }
 
@@ -200,7 +203,7 @@ public class Llvm {
       }
 
       public String toString() {
-          return  type + "* " + ident + "\n";
+          return  "";
       }
     }
 
