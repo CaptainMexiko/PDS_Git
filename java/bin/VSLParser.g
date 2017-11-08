@@ -16,11 +16,16 @@ options {
 // TODO : other rules
 
 program returns [ASD.Program out]
-    : b=bloc { $out = new ASD.Program($b.out); } // TODO : change when you extend the language
+    : DEBLOCK b=bloc FIBLOCK EOF { $out = new ASD.Program($b.out); }
+    |b=bloc EOF { $out = new ASD.Program($b.out); } // TODO : change when you extend the language
     ;
 
 bloc returns [ASD.BlockImplement out]
-  : {List<ASD.StatementImplement> ls = new ArrayList(); } (s=statement {ls.add($s.out);} )+ { $out = new ASD.BlockImplement(ls); }
+  : {List<ASD.StatementImplement> ls = new ArrayList(); } (d=declaration)* (s=statement {ls.add($s.out);} )+ { $out = new ASD.BlockImplement(ls); }
+  ;
+
+declaration returns [ASD.Declaration out]
+  : DECINT {}
   ;
 
 statement returns [ASD.StatementImplement out]
@@ -53,7 +58,7 @@ factor returns [ASD.Expression out]
     ;
 
 affectable returns [ASD.Affectable out]
-  : IDENT { $out = new ASD.AffectableConst(new ASD.IntType(), $IDENT.text); }
+  : IDENT { $out = new ASD.AffectableVar(new ASD.IntType(), $IDENT.text); }
   ;
 
 primary returns [ASD.Expression out]

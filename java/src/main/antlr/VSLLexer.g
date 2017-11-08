@@ -26,8 +26,10 @@ MOINS : '-' ;
 MULT  : '*' ;
 DIV   : '/' ;
 AFFECT : ':=' ;
-
-// TODO : other keywords
+DEBLOCK : '{' ;
+FIBLOCK : '}' ;
+DECINT : 'INT' ;
+VIRGULE : ',' ;
 
 // other tokens (no conflict with keywords in VSL)
 IDENT   : LETTER (LETTER|DIGIT)*;

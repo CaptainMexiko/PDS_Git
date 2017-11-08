@@ -206,10 +206,10 @@ public class Llvm {
 
     static public class AffectExpression extends Instruction {
       Type type;
-      ASD.AffectableConst.RetAffectable affectable;
+      ASD.Affectable.RetAffectable affectable;
       ASD.Expression.RetExpression expression;
 
-      public AffectExpression(Type type, ASD.AffectableConst.RetAffectable affectable, ASD.Expression.RetExpression expression){
+      public AffectExpression(Type type, ASD.Affectable.RetAffectable affectable, ASD.Expression.RetExpression expression){
         this.type = type;
         this.affectable = affectable;
         this.expression = expression;
@@ -220,22 +220,21 @@ public class Llvm {
           if (Character.isLetter(expression.result.charAt(0))){
             p100 = " %";
           }
-          return  "%" + affectable.result + " = alloca " + type + "\n"
-              + "store " + type + p100 + expression.result + ", " + type + "* " + " %" + affectable.result + "\n";
+          return "store " + type + p100 + expression.result + ", " + type + "* " + " %" + affectable.result + "\n";
       }
     }
 
-    static public class Const extends Instruction {
+    static public class Var extends Instruction {
       Type type;
       String ident;
 
-      public Const(Type type, String ident){
+      public Var(Type type, String ident){
         this.type = type;
         this.ident = ident;
       }
 
       public String toString() {
-          return  "";
+          return  "%" + ident + " = alloca " + type + "\n";
       }
     }
 

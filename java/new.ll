@@ -9,19 +9,17 @@ declare i32 @printf(i8* noalias nocapture, ...)
 
 define i32 @main() {
 ; Début block 
+%tmp1 = load i32, i32* %x
+%tmp2 = load i32, i32* %a
+%tmp3 = load i32, i32* %b
+%tmp4 = add i32 3, 4
+%x = alloca i32
+store i32 %tmp4, i32*  %x
 %a = alloca i32
-store i32 3, i32*  %a
-%tmp1 = load i32, i32* %a
+store i32 5, i32*  %a
 %b = alloca i32
-store i32 %tmp1, i32*  %b
-%tmp2 = load i32, i32* %b
-%tmp3 = load i32, i32* %a
-%tmp4 = add i32 %tmp2, %tmp3
-%c = alloca i32
-store i32 %tmp4, i32*  %c
-%tmp5 = load i32, i32* %c
-%tmp6 = add i32 %tmp5, 4
+store i32 5, i32*  %b
 ; Fin block 
-ret i32 %tmp6
+ret i32 %tmp3
 }
 

@@ -33,6 +33,7 @@ public class ASD {
     }
 
     static public abstract class Block{
+        Declaration dImpl;
         List<Statement> corpBlock = new ArrayList<>();
 
         public abstract String pp();
@@ -55,9 +56,11 @@ public class ASD {
     }
 
     static public class BlockImplement extends Block {
+        DeclarationImplement dImpl;
         List<StatementImplement> lStatement = new ArrayList<>();
 
-        public BlockImplement(List<StatementImplement> lStatement) {
+        public BlockImplement(DeclarationImplement dImpl, List<StatementImplement> lStatement) {
+            this.dImpl = dImpl;
             this.lStatement = lStatement;
         }
 
@@ -76,6 +79,11 @@ public class ASD {
 
          Llvm.Instruction commmentBlockD = new Llvm.Comment("Début block ");
          irBlock.appendCode(commmentBlockD);
+
+         if (dImpl != null){
+           Declaration.RetDeclaration retDec = dImpl.toIR();
+           irBlock.append(retDec.ir);
+         }
 
          String lastExprRes = "0";
          Type lastTypeRes = new IntType();
@@ -97,6 +105,51 @@ public class ASD {
         }
     }
 
+    static public abstract class Declaration{
+
+      public abstract String pp();
+
+      public abstract RetDeclaration toIR() throws TypeException;
+
+      // Object returned by toIR on expressions, with IR + synthesized attributes
+      static public class RetDeclaration {
+          // The LLVM IR:
+          public Llvm.IR ir;
+
+          public RetDeclaration(Llvm.IR ir) {
+              this.ir = ir;
+          }
+        }
+      }
+
+      static public class DeclarationImplement extends Declaration{
+        List <AffectableVar> la = new ArrayList<>();
+
+        public DeclarationImplement (List<AffectableVar> la) {
+            this.la = la;
+        }
+
+        // Pretty-printer
+        public String pp() {
+          String str = "";
+            for (AffectableVar a : la) {
+              str = str + a.pp();
+            }
+            return str;
+        }
+
+        // IR generation
+        public RetDeclaration toIR() throws TypeException {
+          Llvm.IR irDecl = new Llvm.IR(Llvm.empty(), Llvm.empty());
+
+          for (AffectableVar a : la) {
+            AffectableVar.RetAffectable retAv = new a.toIR();
+            irDecl.append(retAv.ir);
+          }
+
+          return new RetDeclaration(irDecl);
+        }
+      }
 
     static public abstract class Statement{
 
@@ -487,11 +540,11 @@ public class ASD {
         }
     }
 
-    static public class AffectableConst extends Affectable {
+    static public class AffectableVar extends Affectable {
         Type type;
         String ident;
 
-        public AffectableConst(Type type, String ident) {
+        public AffectableVar(Type type, String ident) {
             this.type = type;
             this.ident = ident;
         }
@@ -505,7 +558,7 @@ public class ASD {
 
           Llvm.IR irConst = new Llvm.IR(Llvm.empty(), Llvm.empty());
 
-          Llvm.Instruction constante = new Llvm.Const(type.toLlvmType(), ident);
+          Llvm.Instruction constante = new Llvm.Var(type.toLlvmType(), ident);
 
           irConst.appendCode(constante);
 
