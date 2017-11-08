@@ -25,7 +25,7 @@ bloc returns [ASD.BlockImplement out]
   ;
 
 declaration returns [ASD.DeclarationImplement out]
-  : DECINT {List<ASD.AffectableVar> la = new ArrayList(); } (a=affectable {la.add($a.out);} )+ { $out = new ASD.DeclarationImplement(la); }
+  : DECINT {List<ASD.AffectableVar> la = new ArrayList(); } (a=affectable {la.add($a.out);} (VIRGULE a=affectable {la.add($a.out);})* )+ { $out = new ASD.DeclarationImplement(la); }
   ;
 
 statement returns [ASD.StatementImplement out]
@@ -57,7 +57,7 @@ factor returns [ASD.Expression out]
     // TODO : that's all?
     ;
 
-affectable returns [ASD.Affectable out]
+affectable returns [ASD.AffectableVar out]
   : IDENT { $out = new ASD.AffectableVar(new ASD.IntType(), $IDENT.text); }
   ;
 

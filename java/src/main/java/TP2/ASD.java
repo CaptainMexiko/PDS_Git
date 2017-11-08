@@ -143,7 +143,7 @@ public class ASD {
           Llvm.IR irDecl = new Llvm.IR(Llvm.empty(), Llvm.empty());
 
           for (AffectableVar a : la) {
-            AffectableVar.RetAffectable retAv = new a.toIR();
+            AffectableVar.RetAffectable retAv = a.toIR();
             irDecl.append(retAv.ir);
           }
 
@@ -524,19 +524,15 @@ public class ASD {
                 throw new TypeException("type mismatch: have " + leftRet.type + " and " + rightRet.type);
             }
 
-            // We base our build on the left generated IR:
-            // append right code
-            leftRet.ir.append(rightRet.ir);
-
             // new affect instruction result = affectable := expression
             Llvm.Instruction affect = new Llvm.AffectExpression(leftRet.type.toLlvmType(),leftRet, rightRet);
 
             // append this instruction
-            leftRet.ir.appendCode(affect);
+            rightRet.ir.appendCode(affect);
 
             // return the generated IR, plus the type of this expression
             // and where to find its result
-            return new RetInstruction(leftRet.ir);
+            return new RetInstruction(rightRet.ir);
         }
     }
 
