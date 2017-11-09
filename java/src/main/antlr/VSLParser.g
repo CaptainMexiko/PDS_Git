@@ -21,11 +21,15 @@ program returns [ASD.Program out]
     ;
 
 bloc returns [ASD.BlockImplement out]
-  : {ASD.DeclarationImplement decl = null; List<ASD.StatementImplement> ls = new ArrayList(); } (d=declaration {decl = $d.out;})? (s=statement {ls.add($s.out);} )+ { $out = new ASD.BlockImplement(decl, ls); }
+  : {ASD.DeclarationImplement decl = null; List<ASD.StatementImplement> ls = new ArrayList(); }
+   (d=declaration {decl = $d.out;})?
+   (s=statement {ls.add($s.out);} )+ { $out = new ASD.BlockImplement(decl, ls); }
   ;
 
 declaration returns [ASD.DeclarationImplement out]
-  : DECINT {List<ASD.AffectableVar> la = new ArrayList(); } (a=affectable {la.add($a.out);} (VIRGULE a=affectable {la.add($a.out);})* )+ { $out = new ASD.DeclarationImplement(la); }
+  : DECINT {List<ASD.AffectableVar> la = new ArrayList(); }
+   (a=affectable {la.add($a.out);}
+  (VIRGULE a=affectable {la.add($a.out);})* )+ { $out = new ASD.DeclarationImplement(la); }
   ;
 
 statement returns [ASD.StatementImplement out]
