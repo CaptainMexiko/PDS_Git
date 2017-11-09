@@ -30,12 +30,27 @@ declaration returns [ASD.DeclarationImplement out]
 
 statement returns [ASD.StatementImplement out]
   : i=instruction { $out = new ASD.StatementImplement($i.out); }
-    | e=expressionbasseprio { $out = new ASD.StatementImplement($e.out); }
+    | e=expression { $out = new ASD.StatementImplement($e.out); }
+    | s=statementreturn { $out = $s.out; }
+  ;
+
+statementreturn returns [ASD.StatementImplement out]
+  : i=instructionreturn { $out = new ASD.StatementImplement($i.out); }
+  ;
+
+instructionreturn returns [ASD.Instruction out]
+  : RET e=expression { $out = new ASD.ReturnInstruction($e.out); }
   ;
 
 instruction returns [ASD.Instruction out]
-    : a=affectable  AFFECT  e=expressionbasseprio  { $out = new ASD.AffectInstruction($a.out, $e.out); }
+    : a=affectable  AFFECT  e=expression  { $out = new ASD.AffectInstruction($a.out, $e.out); }
+    | IIF e=expression TH b=bloc IFI
+    | IIF es=expression TH bs=bloc EL be=bloc IFI
     ;
+
+expression returns [ASD.Expression out]
+  : e=expressionbasseprio { $out = $e.out; }
+  ;
 
 expressionbasseprio returns [ASD.Expression out]
   : l=expressionbasseprio ( PLUS r=expressionhauteprio  { $out = new ASD.AddExpression($l.out, $r.out); }

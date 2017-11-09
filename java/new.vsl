@@ -1,9 +1,7 @@
 {
-INT x, b
+INT x
 
-x := 2 + 4
+IF x + 4 THEN { RETURN 14 } FI
 
-x := x * x / x
-
-x
+RETURN 4
 }

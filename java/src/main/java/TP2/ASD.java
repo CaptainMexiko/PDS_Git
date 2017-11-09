@@ -23,11 +23,6 @@ public class ASD {
 
             // computes the IR of the expression
             Block.RetBlock retBlock = bprincipale.toIR();
-
-            Llvm.Instruction ret = new Llvm.Return(retBlock.type.toLlvmType(), retBlock.value);
-
-            retBlock.ir.appendCode(ret);
-
             return retBlock.ir;
         }
     }
@@ -533,6 +528,34 @@ public class ASD {
             // return the generated IR, plus the type of this expression
             // and where to find its result
             return new RetInstruction(rightRet.ir);
+        }
+    }
+
+    static public class ReturnInstruction extends Instruction {
+        Expression expr;
+
+        public ReturnInstruction(Expression expr) {
+            this.expr = expr;
+        }
+
+        // Pretty-printer
+        public String pp() {
+            return "return " + expr.pp();
+        }
+
+        // IR generation
+        public RetInstruction toIR() throws TypeException {
+            Expression.RetExpression exprRet = expr.toIR();
+
+            // new affect instruction result = affectable := expression
+            Llvm.Instruction returninstr = new Llvm.Return(exprRet.type.toLlvmType(),exprRet.result);
+
+            // append this instruction
+            exprRet.ir.appendCode(returninstr);
+
+            // return the generated IR, plus the type of this expression
+            // and where to find its result
+            return new RetInstruction(exprRet.ir);
         }
     }
 
