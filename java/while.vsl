@@ -1,0 +1,13 @@
+{
+INT x
+x:=10
+
+WHILE 1
+DO
+x:= x*2
+RETURN 0
+DONE
+
+RETURN x
+
+}
