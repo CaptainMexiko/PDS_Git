@@ -537,7 +537,7 @@ public class ASD {
 
 
 
-    /************************************************ Affectation ************************************************/
+    /************************************************ AffectInstruction ************************************************/
     static public class AffectInstruction extends Instruction {
         Affectable left;
         Expression right;
@@ -607,6 +607,10 @@ public class ASD {
         }
     }
 
+
+
+
+    /************************************************ AffectableVar ************************************************/
     static public class AffectableVar extends Affectable {
         Type type;
         String ident;
@@ -633,6 +637,9 @@ public class ASD {
         }
     }
 
+
+
+    /************************************************ Type/Integer ************************************************/
     // Warning: this is the type from VSL+, not the LLVM types!
     static public abstract class Type {
         public abstract String pp();
