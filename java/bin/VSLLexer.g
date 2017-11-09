@@ -30,6 +30,11 @@ DEBLOCK : '{' ;
 FIBLOCK : '}' ;
 DECINT : 'INT' ;
 VIRGULE : ',' ;
+RET : 'RETURN' ;
+IIF : 'IF' ;
+TH : 'THEN' ;
+EL : 'ELSE' ;
+IFI : 'FI' ;
 
 // other tokens (no conflict with keywords in VSL)
 IDENT   : LETTER (LETTER|DIGIT)*;
