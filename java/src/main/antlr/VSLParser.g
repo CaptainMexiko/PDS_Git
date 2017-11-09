@@ -48,8 +48,9 @@ instructionreturn returns [ASD.Instruction out]
 
 instruction returns [ASD.Instruction out]
     : a=affectable  AFFECT  e=expression  { $out = new ASD.AffectInstruction($a.out, $e.out); }
-    | IIF e=expression TH b=bloc IFI
+    | IIF e=expression TH b=bloc IFI       // ?? s=statement { $out = new ASD.StatementImplement($s.out)}
     | IIF es=expression TH bs=bloc EL be=bloc IFI
+    | IWHILE ew=expression IDO bw=bloc FW      // ?? s=statement { $out = new ASD.StatementImplement($s.out)}
     ;
 
 expression returns [ASD.Expression out]
