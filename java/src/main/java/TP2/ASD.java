@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class ASD {
+
+    /************************************************ Program ************************************************/
     static public class Program {
         BlockImplement bprincipale;
         SymbolTable symbolTable = new SymbolTable();
@@ -27,6 +29,8 @@ public class ASD {
         }
     }
 
+
+    /************************************************ Block ************************************************/
     static public abstract class Block{
         Declaration dImpl;
         List<Statement> corpBlock = new ArrayList<>();
@@ -91,6 +95,7 @@ public class ASD {
           lastExprRes = reStat.result;
           lastTypeRes = reStat.type;
           }
+
          }
 
          Llvm.Instruction commmentBlockf = new Llvm.Comment("Fin block ");
@@ -100,6 +105,8 @@ public class ASD {
         }
     }
 
+
+    /************************************************ Declaration ************************************************/
     static public abstract class Declaration{
 
       public abstract String pp();
@@ -146,6 +153,10 @@ public class ASD {
         }
       }
 
+
+
+
+    /************************************************ Statement ************************************************/
     static public abstract class Statement{
 
       public abstract String pp();
@@ -211,6 +222,8 @@ public class ASD {
     // All toIR methods returns the IR, plus extra information (synthesized attributes)
     // They can take extra arguments (inherited attributes)
 
+
+    /************************************************ Expression ************************************************/
     static public abstract class Expression{
         public abstract String pp();
 
@@ -233,6 +246,9 @@ public class ASD {
         }
     }
 
+
+
+    /************************************************ Instruction ************************************************/
     static public abstract class Instruction{
         public abstract String pp();
 
@@ -248,6 +264,8 @@ public class ASD {
         }
     }
 
+
+    /************************************************ Affectable ************************************************/
     static public abstract class Affectable{
         public abstract String pp();
 
@@ -270,6 +288,8 @@ public class ASD {
     }
 
 
+
+    /************************************************ AddExpression ************************************************/
     // Concrete class for Expression: add case
     static public class AddExpression extends Expression {
         Expression left;
@@ -314,6 +334,10 @@ public class ASD {
         }
     }
 
+
+
+
+    /************************************************ MoinsExpression ************************************************/
     static public class MoinsExpression extends Expression {
         Expression left;
         Expression right;
@@ -357,6 +381,9 @@ public class ASD {
         }
     }
 
+
+
+    /************************************************ MultExpression ************************************************/
     static public class MultExpression extends Expression {
         Expression left;
         Expression right;
@@ -400,6 +427,9 @@ public class ASD {
         }
     }
 
+
+
+    /************************************************ DivExpression ************************************************/
     static public class DivExpression extends Expression {
         Expression left;
         Expression right;
@@ -443,6 +473,10 @@ public class ASD {
         }
     }
 
+
+
+
+    /************************************************ Ident ************************************************/
     static public class ExprIdent extends Expression {
         Type type;
         String ident;
@@ -476,6 +510,10 @@ public class ASD {
         }
     }
 
+
+
+
+    /************************************************ Integer ************************************************/
     // Concrete class for Expression: constant (integer) case
     static public class IntegerExpression extends Expression {
         int value;
@@ -495,6 +533,11 @@ public class ASD {
         }
     }
 
+
+
+
+
+    /************************************************ Affectation ************************************************/
     static public class AffectInstruction extends Instruction {
         Affectable left;
         Expression right;
@@ -531,6 +574,11 @@ public class ASD {
         }
     }
 
+
+
+
+
+    /************************************************ Return ************************************************/
     static public class ReturnInstruction extends Instruction {
         Expression expr;
 
