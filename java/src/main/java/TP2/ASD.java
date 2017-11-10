@@ -607,7 +607,58 @@ public class ASD {
         }
     }
 
+    static public class IfInstruction extends Instruction {
+        Expression expr;
+        Block bloc;
 
+        public IfInstruction(Expression expr, Block block) {
+            this.expr = expr;
+            this.bloc = block;
+        }
+
+        // Pretty-printer
+        public String pp() {
+            return "if " + expr.pp() + " then " + bloc.pp();
+        }
+
+        // IR generation
+        public RetInstruction toIR() throws TypeException {
+
+            Llvm.IR ifIR = new Llvm.IR(Llvm.empty(), Llvm.empty());
+
+            Expression.RetExpression exprRet = expr.toIR();
+            Block.RetBlock exprBloc = bloc.toIR();
+
+            String labelThen = Utils.newlab("then");
+            String labelFi = Utils.newlab("fi");
+
+            String icmp = Utils.newicmp();
+
+            Llvm.Instruction labelthen = new Llvm.Label(labelThen);
+            Llvm.Instruction lablefi = new Llvm.Label(labelFi);
+            Llvm.Instruction boolexpr = new Llvm.Bool(exprRet.type.toLlvmType(), icmp, exprRet.result);
+
+
+            // new affect instruction result = affectable := expression
+            Llvm.Instruction ifinstr = new Llvm.IfInst(labelThen, labelFi, icmp);
+
+            Llvm.Instruction commentdeb = new Llvm.Comment("Début du if");
+            Llvm.Instruction commentend = new Llvm.Comment("Fin du if");
+            // append this
+            ifIR.appendCode(commentdeb);
+            //ifIR.append(exprRet.ir);
+            ifIR.appendCode(boolexpr);
+            ifIR.appendCode(ifinstr);
+            ifIR.appendCode(labelthen);
+            ifIR.append(exprBloc.ir);
+            ifIR.appendCode(lablefi);
+            ifIR.appendCode(commentend);
+
+            // return the generated IR, plus the type of this expression
+            // and where to find its result
+            return new RetInstruction(exprRet.ir);
+        }
+    }
 
 
     /************************************************ AffectableVar ************************************************/

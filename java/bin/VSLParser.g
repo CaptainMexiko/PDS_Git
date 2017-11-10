@@ -10,10 +10,13 @@ options {
 
   import java.util.stream.Collectors;
   import java.util.Arrays;
+
 }
 
 
 // TODO : other rules
+
+
 
 program returns [ASD.Program out]
     : DEBLOCK b=bloc FIBLOCK EOF { $out = new ASD.Program($b.out); }
@@ -21,11 +24,15 @@ program returns [ASD.Program out]
     ;
 
 bloc returns [ASD.BlockImplement out]
-  : {ASD.DeclarationImplement decl = null; List<ASD.StatementImplement> ls = new ArrayList(); } (d=declaration {decl = $d.out;})? (s=statement {ls.add($s.out);} )+ { $out = new ASD.BlockImplement(decl, ls); }
+  : {ASD.DeclarationImplement decl = null; List<ASD.StatementImplement> ls = new ArrayList(); }
+   (d=declaration {decl = $d.out;})?
+   (s=statement {ls.add($s.out);} )+ { $out = new ASD.BlockImplement(decl, ls); }
   ;
 
 declaration returns [ASD.DeclarationImplement out]
-  : DECINT {List<ASD.AffectableVar> la = new ArrayList(); } (a=affectable {la.add($a.out);} (VIRGULE a=affectable {la.add($a.out);})* )+ { $out = new ASD.DeclarationImplement(la); }
+  : DECINT {List<ASD.AffectableVar> la = new ArrayList(); }
+   (a=affectable {la.add($a.out);}
+  (VIRGULE a=affectable {la.add($a.out);})* )+ { $out = new ASD.DeclarationImplement(la); }
   ;
 
 statement returns [ASD.StatementImplement out]
@@ -44,8 +51,9 @@ instructionreturn returns [ASD.Instruction out]
 
 instruction returns [ASD.Instruction out]
     : a=affectable  AFFECT  e=expression  { $out = new ASD.AffectInstruction($a.out, $e.out); }
-    | IIF e=expression TH b=bloc IFI
-    | IIF es=expression TH bs=bloc EL be=bloc IFI
+    | IIF ei=expression TH b=bloc IFI { $out = new ASD.IfInstruction($ei.out, $b.out); }
+    //| IIF es=expression TH bs=bloc EL be=bloc IFI { $out = new ASD.IfInstructionElse($es.out, $bs.out, $be.out); }
+    //| IWHILE ew=expression IDO bw=bloc FW      // ?? s=statement { $out = new ASD.StatementImplement($s.out)}
     ;
 
 expression returns [ASD.Expression out]

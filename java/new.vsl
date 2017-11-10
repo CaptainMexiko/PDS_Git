@@ -1,7 +1,9 @@
 {
 INT x
 
-IF x + 4 THEN { RETURN 14 } FI
+IF x
+THEN x := 14
+FI
 
-RETURN 4
+RETURN x
 }

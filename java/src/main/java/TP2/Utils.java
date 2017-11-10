@@ -7,6 +7,7 @@ public class Utils {
     private static int tmp = 0;
     private static int lab = 0;
     private static int glob = 0;
+    private static int icmp = 0;
     private final static Pattern re = Pattern.compile("\\\\n");
 
     // return "  " × level, useful for code indentation
@@ -21,6 +22,11 @@ public class Utils {
     public static String newtmp() {
         tmp++;
         return "%tmp" + tmp;
+    }
+
+    public static String newicmp() {
+      icmp++;
+      return "%icmp" + icmp;
     }
 
     // generate a new unique label starting with str

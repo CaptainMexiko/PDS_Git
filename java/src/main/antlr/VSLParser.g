@@ -10,10 +10,13 @@ options {
 
   import java.util.stream.Collectors;
   import java.util.Arrays;
+
 }
 
 
 // TODO : other rules
+
+
 
 program returns [ASD.Program out]
     : DEBLOCK b=bloc FIBLOCK EOF { $out = new ASD.Program($b.out); }
@@ -48,9 +51,9 @@ instructionreturn returns [ASD.Instruction out]
 
 instruction returns [ASD.Instruction out]
     : a=affectable  AFFECT  e=expression  { $out = new ASD.AffectInstruction($a.out, $e.out); }
-    | IIF e=expression TH b=bloc IFI       // ?? s=statement { $out = new ASD.StatementImplement($s.out)}
-    | IIF es=expression TH bs=bloc EL be=bloc IFI
-    | IWHILE ew=expression IDO bw=bloc FW      // ?? s=statement { $out = new ASD.StatementImplement($s.out)}
+    | IIF ei=expression TH b=bloc IFI { $out = new ASD.IfInstruction($ei.out, $b.out); }
+    //| IIF es=expression TH bs=bloc EL be=bloc IFI { $out = new ASD.IfInstructionElse($es.out, $bs.out, $be.out); }
+    //| IWHILE ew=expression IDO bw=bloc FW      // ?? s=statement { $out = new ASD.StatementImplement($s.out)}
     ;
 
 expression returns [ASD.Expression out]

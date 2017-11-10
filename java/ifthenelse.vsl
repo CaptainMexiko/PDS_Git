@@ -5,7 +5,6 @@ x:=5
 
 IF x
 THEN b:= 5+2
-ELSE b:=1
 FI
 
 RETURN b

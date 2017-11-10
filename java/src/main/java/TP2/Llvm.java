@@ -102,6 +102,63 @@ public class Llvm {
         }
     }
 
+    static public class Label extends Instruction {
+        String lvalue;
+
+        public Label(String lvalue) {
+            this.lvalue = lvalue;
+        }
+
+        public String toString() {
+            return lvalue + ":" + "\n";
+        }
+    }
+
+    static public class AppelLabel extends Instruction {
+        String lvalue;
+
+        public AppelLabel(String lvalue) {
+            this.lvalue = lvalue;
+        }
+
+        public String toString() {
+            return "br label %" + lvalue + "\n";
+        }
+    }
+
+    static public class Bool extends Instruction {
+        Type type;
+        String icmp;
+        String result;
+
+        public Bool(Type type, String icmp, String result) {
+            this.type = type;
+            this.icmp = icmp;
+            this.result = result;
+        }
+
+        public String toString() {
+            return result + "= icmp ne i1" + type + " " + result + ", 0 \n";
+        }
+    }
+
+    static public class IfInst extends Instruction {
+        String then;
+        String fi;
+        String icmp;
+
+        public IfInst(String then, String fi, String icmp) {
+            this.then = then;
+            this.fi = fi;
+            this.icmp = icmp;
+        }
+
+        public String toString() {
+            return "br i1 " + icmp + ", label %" + then + ", label %" + fi + "\n";
+        }
+    }
+
+
     static public class Add extends Instruction {
         Type type;
         String left;
