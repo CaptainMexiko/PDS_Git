@@ -31,13 +31,13 @@ FIBLOCK : '}' ;
 DECINT : 'INT' ;
 VIRGULE : ',' ;
 RET : 'RETURN' ;
-IIF : 'IF' ;
-TH : 'THEN' ;
-EL : 'ELSE' ;
-IFI : 'FI' ;
-IWHILE : 'WHILE' ;
-IDO : 'DO' ;
-FW : 'DONE' ;
+IF : 'IF' ;
+THEN : 'THEN' ;
+ELSE : 'ELSE' ;
+FI : 'FI' ;
+WHILE : 'WHILE' ;
+DO : 'DO' ;
+DONE : 'DONE' ;
 
 // other tokens (no conflict with keywords in VSL)
 IDENT   : LETTER (LETTER|DIGIT)*;

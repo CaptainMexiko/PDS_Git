@@ -510,6 +510,37 @@ public class ASD {
         }
     }
 
+    static public class ExpressionIf extends Expression {
+        Expression expr;
+
+        public ExpressionIf(Expression expr) {
+            this.expr = expr;
+        }
+
+        // Pretty-printer
+        public String pp() {
+            return "(" + expr.pp() + ")";
+        }
+
+        // IR generation
+        public RetExpression toIR() throws TypeException {
+
+            Expression.RetExpression exprRet = expr.toIR();
+
+            String icmp = Utils.newicmp();
+
+            // new add instruction result = left + right
+            Llvm.Instruction exprIfCond = new Llvm.Bool(exprRet.type.toLlvmType(), icmp , exprRet.result);
+
+            // append this instruction
+            exprRet.ir.appendCode(exprIfCond);
+
+            // return the generated IR, plus the type of this expression
+            // and where to find its result
+            return new RetExpression(exprRet.ir, exprRet.type, icmp);
+        }
+    }
+
 
 
 
@@ -607,59 +638,124 @@ public class ASD {
         }
     }
 
-    static public class IfInstruction extends Instruction {
+    static public class IfInstructionElse extends Instruction {
         Expression expr;
         Block bloc;
+        Block bloc2;
 
-        public IfInstruction(Expression expr, Block block) {
+        public IfInstructionElse(Expression expr, Block block, Block bloc2) {
             this.expr = expr;
             this.bloc = block;
+            this.bloc2 = bloc2;
         }
 
         // Pretty-printer
         public String pp() {
-            return "if " + expr.pp() + " then " + bloc.pp();
+            return "if " + expr.pp() + " then " + bloc.pp() + " else " + bloc2.pp();
         }
 
         // IR generation
         public RetInstruction toIR() throws TypeException {
+            String labelElse = null;
+            Llvm.Instruction labelelse = null;
+            Block.RetBlock expr2Bloc = null;
 
             Llvm.IR ifIR = new Llvm.IR(Llvm.empty(), Llvm.empty());
 
             Expression.RetExpression exprRet = expr.toIR();
             Block.RetBlock exprBloc = bloc.toIR();
 
+            if(this.bloc2 != null){
+            expr2Bloc = bloc2.toIR();
+          }
+
             String labelThen = Utils.newlab("then");
             String labelFi = Utils.newlab("fi");
 
-            String icmp = Utils.newicmp();
-
             Llvm.Instruction labelthen = new Llvm.Label(labelThen);
             Llvm.Instruction lablefi = new Llvm.Label(labelFi);
-            Llvm.Instruction boolexpr = new Llvm.Bool(exprRet.type.toLlvmType(), icmp, exprRet.result);
 
+            if(this.bloc2 != null){
+              labelElse = Utils.newlab("else");
+              labelelse = new Llvm.Label(labelElse);
+            }
 
             // new affect instruction result = affectable := expression
-            Llvm.Instruction ifinstr = new Llvm.IfInst(labelThen, labelFi, icmp);
+            Llvm.Instruction ifinstr = new Llvm.IfInstElse(labelThen, labelElse, labelFi, exprRet.result);
+            Llvm.Instruction appelfi = new Llvm.AppelLabel(labelFi);
 
             Llvm.Instruction commentdeb = new Llvm.Comment("Début du if");
             Llvm.Instruction commentend = new Llvm.Comment("Fin du if");
             // append this
             ifIR.appendCode(commentdeb);
-            //ifIR.append(exprRet.ir);
-            ifIR.appendCode(boolexpr);
+            ifIR.append(exprRet.ir);
             ifIR.appendCode(ifinstr);
             ifIR.appendCode(labelthen);
             ifIR.append(exprBloc.ir);
+            ifIR.appendCode(appelfi);
+            if(bloc2 != null){
+            ifIR.appendCode(labelelse);
+            ifIR.append(expr2Bloc.ir);
+            ifIR.appendCode(appelfi);
+          }
             ifIR.appendCode(lablefi);
             ifIR.appendCode(commentend);
 
             // return the generated IR, plus the type of this expression
             // and where to find its result
-            return new RetInstruction(exprRet.ir);
+            return new RetInstruction(ifIR);
         }
     }
 
+
+    static public class InstructionWhile extends Instruction {
+        Expression expr;
+        Block bloc;
+
+        public InstructionWhile(Expression expr, Block block) {
+            this.expr = expr;
+            this.bloc = block;
+        }
+
+        // Pretty-printer
+        public String pp() {
+            return "while " + expr.pp() + " then " + bloc.pp() + " else ";
+        }
+
+        // IR generation
+        public RetInstruction toIR() throws TypeException {
+            Llvm.IR instWhile = new Llvm.IR(Llvm.empty(), Llvm.empty());
+
+            Expression.RetExpression exprRet = expr.toIR();
+            Block.RetBlock exprBloc = bloc.toIR();
+
+            String labelWhile = Utils.newlab("while");
+            String labelDo = Utils.newlab("do");
+            String labelDone = Utils.newlab("done");
+            String icmp = exprRet.result;
+
+            Llvm.Instruction labelwhile = new Llvm.Label(labelWhile);
+            Llvm.Instruction labeldo = new Llvm.Label(labelDo);
+            Llvm.Instruction labeldone = new Llvm.Label(labelDone);
+            Llvm.Instruction appelwhile = new Llvm.AppelLabel(labelWhile);
+
+            Llvm.Instruction whileinst = new Llvm.WhileInst(labelDo, labelDone, icmp);
+
+            instWhile.appendCode(appelwhile);
+            instWhile.appendCode(labelwhile);
+            instWhile.append(exprRet.ir);
+            instWhile.appendCode(whileinst);
+            instWhile.appendCode(labeldo);
+            instWhile.append(exprBloc.ir);
+            instWhile.appendCode(appelwhile);
+            instWhile.appendCode(labeldone);
+
+
+            // return the generated IR, plus the type of this expression
+            // and where to find its result
+            return new RetInstruction(instWhile);
+        }
+    }
 
     /************************************************ AffectableVar ************************************************/
     static public class AffectableVar extends Affectable {

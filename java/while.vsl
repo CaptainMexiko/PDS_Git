@@ -1,13 +1,19 @@
 {
-INT x
+INT x, b
 x:=10
+b := x
 
-WHILE 1
+WHILE x
 DO
-x:= x*2
-RETURN 0
+
+WHILE b
+DO
+b:=b-1
 DONE
 
-RETURN x
+x:= x - 1
+DONE
+
+RETURN 14
 
 }

@@ -51,10 +51,13 @@ instructionreturn returns [ASD.Instruction out]
 
 instruction returns [ASD.Instruction out]
     : a=affectable  AFFECT  e=expression  { $out = new ASD.AffectInstruction($a.out, $e.out); }
-    | IIF ei=expression TH b=bloc IFI { $out = new ASD.IfInstruction($ei.out, $b.out); }
-    //| IIF es=expression TH bs=bloc EL be=bloc IFI { $out = new ASD.IfInstructionElse($es.out, $bs.out, $be.out); }
-    //| IWHILE ew=expression IDO bw=bloc FW      // ?? s=statement { $out = new ASD.StatementImplement($s.out)}
+    | { ASD.Block bx = null; } IF ei=expressionif THEN b=bloc (ELSE be=bloc { bx = $be.out; } )? FI { $out = new ASD.IfInstructionElse($ei.out, $b.out, bx); }
+    | WHILE ew=expression DO bw=bloc DONE { $out = new ASD.InstructionWhile($ew.out, $bw.out); } 
     ;
+
+expressionif returns [ASD.Expression out]
+  : e=expression { $out = new ASD.ExpressionIf($e.out);}
+  ;
 
 expression returns [ASD.Expression out]
   : e=expressionbasseprio { $out = $e.out; }

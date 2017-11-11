@@ -1,8 +1,12 @@
 {
-INT x
+INT x, b
+
+x := 3 + x
+b := 0
 
 IF x
-THEN x := 14
+THEN RETURN 4
+ELSE IF x + 2 THEN RETURN 3 FI
 FI
 
 RETURN x

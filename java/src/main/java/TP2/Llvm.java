@@ -110,7 +110,7 @@ public class Llvm {
         }
 
         public String toString() {
-            return lvalue + ":" + "\n";
+            return "\n" + lvalue + ":" + "\n";
         }
     }
 
@@ -138,25 +138,52 @@ public class Llvm {
         }
 
         public String toString() {
-            return result + "= icmp ne i1" + type + " " + result + ", 0 \n";
+            return icmp + " = icmp ne " + type + " " + result + ", 0 \n";
         }
     }
 
-    static public class IfInst extends Instruction {
+    static public class IfInstElse extends Instruction {
         String then;
+        String elseCond;
         String fi;
         String icmp;
 
-        public IfInst(String then, String fi, String icmp) {
+        public IfInstElse(String then, String elseCond,String fi, String icmp) {
             this.then = then;
+            this.elseCond = elseCond;
             this.fi = fi;
             this.icmp = icmp;
         }
 
         public String toString() {
-            return "br i1 " + icmp + ", label %" + then + ", label %" + fi + "\n";
+          String rep;
+          if(elseCond != null){
+            rep =  "br i1 " + icmp + ", label %" + then + ", label %" + elseCond + "\n";
+          }
+          else {
+            rep = "br i1 " + icmp + ", label %" + then + ", label %" + fi + "\n";
         }
+        return rep;
     }
+  }
+
+  static public class WhileInst extends Instruction {
+      String doLab;
+      String done;
+      String icmp;
+
+      public WhileInst(String doLAb, String done, String icmp) {
+          this.doLab = doLAb;
+          this.done = done;
+          this.icmp = icmp;
+      }
+
+      public String toString() {
+        String rep;
+          rep = "br i1 " + icmp + ", label %" + doLab + ", label %" + done + "\n";
+      return rep;
+  }
+}
 
 
     static public class Add extends Instruction {
