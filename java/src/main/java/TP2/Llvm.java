@@ -102,6 +102,9 @@ public class Llvm {
         }
     }
 
+
+
+/************************************************ Label ************************************************/
     static public class Label extends Instruction {
         String lvalue;
 
@@ -113,6 +116,8 @@ public class Llvm {
             return "\n" + lvalue + ":" + "\n";
         }
     }
+
+
 
     static public class AppelLabel extends Instruction {
         String lvalue;
@@ -126,6 +131,8 @@ public class Llvm {
         }
     }
 
+
+/************************************************ Bool ************************************************/
     static public class Bool extends Instruction {
         Type type;
         String icmp;
@@ -142,6 +149,9 @@ public class Llvm {
         }
     }
 
+
+
+/************************************************ IfThenElse ************************************************/
     static public class IfInstElse extends Instruction {
         String then;
         String elseCond;
@@ -167,6 +177,10 @@ public class Llvm {
     }
   }
 
+
+
+
+/************************************************ While ************************************************/
   static public class WhileInst extends Instruction {
       String doLab;
       String done;
@@ -186,6 +200,8 @@ public class Llvm {
 }
 
 
+
+/************************************************ Add/Moins/Mul/Div ************************************************/
     static public class Add extends Instruction {
         Type type;
         String left;

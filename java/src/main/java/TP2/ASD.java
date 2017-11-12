@@ -638,6 +638,12 @@ public class ASD {
         }
     }
 
+
+
+
+
+
+    /************************************************ IfInstElse ************************************************/
     static public class IfInstructionElse extends Instruction {
         Expression expr;
         Block bloc;
@@ -708,6 +714,9 @@ public class ASD {
     }
 
 
+
+
+    /************************************************ InstructionWhile ************************************************/
     static public class InstructionWhile extends Instruction {
         Expression expr;
         Block bloc;
