@@ -52,7 +52,7 @@ instructionreturn returns [ASD.Instruction out]
 instruction returns [ASD.Instruction out]
     : a=affectable  AFFECT  e=expression  { $out = new ASD.AffectInstruction($a.out, $e.out); }
     | { ASD.Block bx = null; } IF ei=expressionif THEN b=bloc (ELSE be=bloc { bx = $be.out; } )? FI { $out = new ASD.IfInstructionElse($ei.out, $b.out, bx); }
-    | WHILE ew=expression DO bw=bloc DONE { $out = new ASD.InstructionWhile($ew.out, $bw.out); } 
+    | WHILE ew=expressionif DO bw=bloc DONE { $out = new ASD.InstructionWhile($ew.out, $bw.out); } 
     ;
 
 expressionif returns [ASD.Expression out]
