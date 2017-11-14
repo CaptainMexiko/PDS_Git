@@ -11,6 +11,7 @@ define i32 @main() {
 ; Début block 
 %x = alloca i32
 %b = alloca i32
+%c = alloca i32
 store i32 10, i32*  %x
 %tmp1 = load i32, i32* %x
 store i32 %tmp1, i32*  %b
@@ -35,13 +36,16 @@ do2:
 %tmp4 = load i32, i32* %b
 %tmp5 = sub i32 %tmp4, 1
 store i32 %tmp5, i32*  %b
+%tmp6 = load i32, i32* %c
+%tmp7 = add i32 %tmp6, 1
+store i32 %tmp7, i32*  %c
 ; Fin block 
 br label %while1
 
 done3:
-%tmp6 = load i32, i32* %x
-%tmp7 = sub i32 %tmp6, 1
-store i32 %tmp7, i32*  %x
+%tmp8 = load i32, i32* %x
+%tmp9 = sub i32 %tmp8, 1
+store i32 %tmp9, i32*  %x
 ; Fin block 
 br label %while4
 

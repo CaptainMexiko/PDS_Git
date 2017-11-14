@@ -19,8 +19,14 @@ options {
 
 
 program returns [ASD.Program out]
-    : DEBLOCK b=bloc FIBLOCK EOF { $out = new ASD.Program($b.out); }
-    |b=bloc EOF { $out = new ASD.Program($b.out); } // TODO : change when you extend the language
+    : {List<ASD.Function> lf = new ArrayList(); } (f=function {lf.add($f.out);} )+ { $out = new ASD.Program(lf); }
+    ;
+
+function returns [ASD.Function out]
+    : PROTO (VOID|INT) IDENT DEBLOCK b=bloc FIBLOCK { $out = new ASD.FunctionProto($IDENT.text, $b.out); }
+    |PROTO (VOID|INT) IDENT b=bloc { $out = new ASD.FunctionProto($IDENT.text, $b.out); }
+    |FUNC (VOID|INT) IDENT DEBLOCK b=bloc FIBLOCK { $out = new ASD.FunctionImplement($IDENT.text, $b.out); }
+    |FUNC (VOID|INT) IDENT b=bloc { $out = new ASD.FunctionImplement($IDENT.text, $b.out); } // TODO : change when you extend the language
     ;
 
 bloc returns [ASD.BlockImplement out]
@@ -52,7 +58,7 @@ instructionreturn returns [ASD.Instruction out]
 instruction returns [ASD.Instruction out]
     : a=affectable  AFFECT  e=expression  { $out = new ASD.AffectInstruction($a.out, $e.out); }
     | { ASD.Block bx = null; } IF ei=expressionif THEN b=bloc (ELSE be=bloc { bx = $be.out; } )? FI { $out = new ASD.IfInstructionElse($ei.out, $b.out, bx); }
-    | WHILE ew=expressionif DO bw=bloc DONE { $out = new ASD.InstructionWhile($ew.out, $bw.out); } 
+    | WHILE ew=expressionif DO bw=bloc DONE { $out = new ASD.InstructionWhile($ew.out, $bw.out); }
     ;
 
 expressionif returns [ASD.Expression out]

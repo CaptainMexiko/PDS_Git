@@ -82,6 +82,12 @@ public class Llvm {
         }
     }
 
+    static public class VoidType extends Type {
+        public String toString() {
+            return "void";
+        }
+    }
+
     // TODO : other types
 
 

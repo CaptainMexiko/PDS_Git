@@ -30,7 +30,51 @@ public class ASD {
     }
 
 
+    static public abstract class Function{
+        String ident;
+        BlockImplement bloc;
+
+        public abstract String pp();
+
+        public abstract RetFunction toIR() throws TypeException;
+
+        // Object returned by toIR on expressions, with IR + synthesized attributes
+        static public class RetFunction{
+            // The LLVM IR:
+            public Llvm.IR ir;
+
+            public RetFunction(Llvm.IR ir) {
+                this.ir = ir;
+            }
+        }
+    }
+
+    static public class FunctionImplement extends Function {
+        String ident;
+        BlockImplement bloc;
+
+        public FunctionImplement(String ident, BlockImplement bloc) {
+            this.ident = ident;
+            this.bloc = bloc;
+        }
+
+        // Pretty-printer
+        public String pp() {
+          return "Function " + ident + bloc.pp();
+        }
+
+        // IR generation
+        public RetFunction toIR() throws TypeException {
+          Llvm.IR irFunction = new Llvm.IR(Llvm.empty(), Llvm.empty());
+
+
+         return new RetFunction(irFunction);
+        }
+    }
+
     /************************************************ Block ************************************************/
+
+
     static public abstract class Block{
         Declaration dImpl;
         List<Statement> corpBlock = new ArrayList<>();
@@ -815,6 +859,21 @@ public class ASD {
 
         public Llvm.Type toLlvmType() {
             return new Llvm.IntType();
+        }
+    }
+
+    static class VoidType extends Type {
+        public String pp() {
+            return "VOID";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof VoidType;
+        }
+
+        public Llvm.Type toLlvmType() {
+            return new Llvm.VoidType();
         }
     }
   }
