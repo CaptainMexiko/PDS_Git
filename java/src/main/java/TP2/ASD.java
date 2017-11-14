@@ -330,7 +330,23 @@ public class ASD {
             }
         }
     }
+    
+    /************************************************ Affichable ************************************************/
 
+    static public abstract class Affichable{
+        public abstract String pp();
+
+        public abstract RetAffichable toIR() throws TypeException;
+
+        static public class RetAffichable {
+            // The LLVM IR:
+            public String name;
+
+            public RetAffichable(String name) {
+                this.name = name;
+            }
+        }
+    }
 
 
     /************************************************ AddExpression ************************************************/
@@ -807,6 +823,27 @@ public class ASD {
             // return the generated IR, plus the type of this expression
             // and where to find its result
             return new RetInstruction(instWhile);
+        }
+    }
+    
+    /************************************************ Affichable ************************************************/
+    static public class AffichableImpl extends Affichable {
+     
+        String ident;
+
+        public AffichableImpl(String ident) {
+            
+            this.ident = ident;
+        }
+
+        public String pp() {
+            return "" + ident;
+        }
+
+
+        public RetAffichable toIR() {
+
+            return new RetAffichable(ident);
         }
     }
 
