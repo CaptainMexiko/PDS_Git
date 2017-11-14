@@ -53,6 +53,8 @@ instruction returns [ASD.Instruction out]
     : a=affectable  AFFECT  e=expression  { $out = new ASD.AffectInstruction($a.out, $e.out); }
     | { ASD.Block bx = null; } IF ei=expressionif THEN b=bloc (ELSE be=bloc { bx = $be.out; } )? FI { $out = new ASD.IfInstructionElse($ei.out, $b.out, bx); }
     | WHILE ew=expressionif DO bw=bloc DONE { $out = new ASD.InstructionWhile($ew.out, $bw.out); } 
+    //| READ r=affectable
+    | PRINT a=affichable (VIRGULE a=affichable)* { $out = new ASD.Affichable($a.out);}
     ;
 
 expressionif returns [ASD.Expression out]
@@ -82,7 +84,13 @@ factor returns [ASD.Expression out]
     | LP e=expressionbasseprio RP { $out = $e.out; }
     // TODO : that's all?
     ;
-
+    
+affichable returns [ASD.Affichable out]
+	: TEXT { $out = new ASD.Affichable($TEXT.text);}
+	| IDENT { $out = new ASD.ExprIdent(new ASD.IntType(), $IDENT.text);}
+	;
+	
+	
 affectable returns [ASD.AffectableVar out]
   : IDENT { $out = new ASD.AffectableVar(new ASD.IntType(), $IDENT.text); }
   ;
