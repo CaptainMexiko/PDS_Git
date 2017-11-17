@@ -8,29 +8,36 @@ public class ASD {
 
     /************************************************ Program ************************************************/
     static public class Program {
-        BlockImplement bprincipale;
+        List<Function> lfunct;
         SymbolTable symbolTable = new SymbolTable();
-        public Program(BlockImplement bprincipale) {
-            this.bprincipale = bprincipale;
+        public Program(List<Function> lf) {
+            this.lfunct = lf;
         }
 
         // Pretty-printer
         public String pp() {
-            return bprincipale.pp();
+            String ret = "";
+            for (Function f : lfunct) {
+              ret = ret + f.pp();
+            }
+            return ret;
         }
 
         // IR generation
         public Llvm.IR toIR() throws TypeException {
-            // TODO : change when you extend the language
+            Llvm.IR irprog = new Llvm.IR(Llvm.empty(), Llvm.empty());
 
-            // computes the IR of the expression
-            Block.RetBlock retBlock = bprincipale.toIR();
-            return retBlock.ir;
+            for (Function f : lfunct) {
+              Function.RetFunction retF = f.toIR();
+              irprog.append(retF.ir);
+            }
+            return irprog;
         }
     }
 
 
     static public abstract class Function{
+        Type type;
         String ident;
         BlockImplement bloc;
 
@@ -50,17 +57,51 @@ public class ASD {
     }
 
     static public class FunctionImplement extends Function {
+        Type type;
         String ident;
         BlockImplement bloc;
 
-        public FunctionImplement(String ident, BlockImplement bloc) {
+        public FunctionImplement(Type type, String ident, BlockImplement bloc) {
+            this.type = type;
             this.ident = ident;
             this.bloc = bloc;
         }
 
         // Pretty-printer
         public String pp() {
-          return "Function " + ident + bloc.pp();
+          return "Function " + type.pp() + ident + bloc.pp();
+        }
+
+        // IR generation
+        public RetFunction toIR() throws TypeException {
+          Block.RetBlock retbloc = bloc.toIR();
+
+          Llvm.IR irFunction = new Llvm.IR(Llvm.empty(), Llvm.empty());
+          Llvm.Instruction instFunc = new Llvm.Function(type.toLlvmType(), ident);
+          Llvm.Instruction instend = new Llvm.EndFunction();
+
+          irFunction.appendCode(instFunc);
+          irFunction.append(retbloc.ir);
+          irFunction.appendCode(instend);
+
+         return new RetFunction(irFunction);
+        }
+    }
+
+    static public class FunctionProto extends Function {
+        Type type;
+        String ident;
+        BlockImplement bloc;
+
+        public FunctionProto(Type type, String ident, BlockImplement bloc) {
+            this.type = type;
+            this.ident = ident;
+            this.bloc = bloc;
+        }
+
+        // Pretty-printer
+        public String pp() {
+          return "Function " + type.pp() + ident + bloc.pp();
         }
 
         // IR generation
@@ -263,9 +304,6 @@ public class ASD {
       }
     }
 
-    // All toIR methods returns the IR, plus extra information (synthesized attributes)
-    // They can take extra arguments (inherited attributes)
-
 
     /************************************************ Expression ************************************************/
     static public abstract class Expression{
@@ -330,7 +368,7 @@ public class ASD {
             }
         }
     }
-    
+
     /************************************************ Affichable ************************************************/
 
     static public abstract class Affichable{
@@ -341,9 +379,11 @@ public class ASD {
         static public class RetAffichable {
             // The LLVM IR:
             public String name;
+            public Expression expr;
 
-            public RetAffichable(String name) {
+            public RetAffichable(String name, Expression expr) {
                 this.name = name;
+                this.expr = expr;
             }
         }
     }
@@ -698,7 +738,28 @@ public class ASD {
         }
     }
 
+    static public class Print extends Instruction {
+      List<Affichable> listAffich;
 
+        public Print(List<Affichable> lA) {
+            this.listAffich = lA;
+        }
+
+        // Pretty-printer
+        public String pp() {
+            String rep = "";
+            for (Affichable aff : listAffich) {
+              rep = rep + aff.pp();
+            }
+            return rep;
+        }
+
+        // IR generation
+        public RetInstruction toIR() throws TypeException {
+            Llvm.IR irPrint = new Llvm.IR(Llvm.empty(), Llvm.empty());
+            return new RetInstruction(irPrint);
+        }
+    }
 
 
 
@@ -825,25 +886,39 @@ public class ASD {
             return new RetInstruction(instWhile);
         }
     }
-    
+
     /************************************************ Affichable ************************************************/
     static public class AffichableImpl extends Affichable {
-     
-        String ident;
+        String ident = null;
+        Expression expr = null;
 
         public AffichableImpl(String ident) {
-            
             this.ident = ident;
         }
 
+        public AffichableImpl(Expression expr){
+          this.expr = expr;
+        }
+
         public String pp() {
-            return "" + ident;
+          String rep = "";
+          if(ident != null){
+            rep = ident;
+          }
+          else {
+            rep = expr.pp();
+          }
+            return rep;
         }
 
 
         public RetAffichable toIR() {
-
-            return new RetAffichable(ident);
+          if(expr == null){
+            return new RetAffichable(ident, null);
+          }
+          else {
+            return new RetAffichable(null, expr);
+          }
         }
     }
 

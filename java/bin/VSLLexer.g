@@ -38,14 +38,11 @@ FI : 'FI' ;
 WHILE : 'WHILE' ;
 DO : 'DO' ;
 DONE : 'DONE' ;
-<<<<<<< HEAD
 FUNC : 'FUNC' ;
 PROTO : 'PROTO' ;
 VOID : 'VOID' ;
-=======
 READ : 'READ' ;
 PRINT : 'PRINT' ;
->>>>>>> 42dcde5edc202e8025feed2bd760efe2f13cc398
 
 // other tokens (no conflict with keywords in VSL)
 IDENT   : LETTER (LETTER|DIGIT)*;

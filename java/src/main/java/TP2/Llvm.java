@@ -52,14 +52,9 @@ public class Llvm {
 
             // We create the function main
             // TODO : remove this when you extend the language
-            r.append("define i32 @main() {\n");
-
 
             for (Instruction inst : code)
                 r.append(inst);
-
-            // TODO : remove this when you extend the language
-            r.append("}\n");
 
             return r.toString();
         }
@@ -106,6 +101,33 @@ public class Llvm {
         public String toString() {
             return "; " + lvalue + "\n";
         }
+    }
+
+
+/************************************************ Function **********************************************/
+
+    static public class Function extends Instruction {
+      Type type;
+      String ident;
+
+      public Function(Type type, String ident) {
+          this.type = type;
+          this.ident = ident;
+      }
+
+      public String toString() {
+          return "define " + type + "@" + ident + "(){" + "\n";
+      }
+    }
+
+    static public class EndFunction extends Instruction {
+
+
+      public EndFunction(){};
+
+      public String toString() {
+          return  "}";
+      }
     }
 
 

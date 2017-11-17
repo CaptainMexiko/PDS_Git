@@ -23,16 +23,17 @@ program returns [ASD.Program out]
     ;
 
 function returns [ASD.Function out]
-    : PROTO (VOID|INT) IDENT DEBLOCK b=bloc FIBLOCK { $out = new ASD.FunctionProto($IDENT.text, $b.out); }
-    |PROTO (VOID|INT) IDENT b=bloc { $out = new ASD.FunctionProto($IDENT.text, $b.out); }
-    |FUNC (VOID|INT) IDENT DEBLOCK b=bloc FIBLOCK { $out = new ASD.FunctionImplement($IDENT.text, $b.out); }
-    |FUNC (VOID|INT) IDENT b=bloc { $out = new ASD.FunctionImplement($IDENT.text, $b.out); } // TODO : change when you extend the language
+    : { ASD.Type typeP = null; } PROTO (VOID { typeP = new ASD.VoidType(); } | DECINT { typeP = new ASD.IntType(); } ) IDENT DEBLOCK b=bloc FIBLOCK { $out = new ASD.FunctionProto(typeP, $IDENT.text, $b.out); }
+    | { ASD.Type typeF = null; } FUNC (VOID { typeF = new ASD.VoidType(); } | DECINT { typeF = new ASD.IntType(); } ) IDENT DEBLOCK b=bloc FIBLOCK { $out = new ASD.FunctionImplement(typeF, $IDENT.text, $b.out); } // TODO : change when you extend the language
     ;
 
 bloc returns [ASD.BlockImplement out]
   : {ASD.DeclarationImplement decl = null; List<ASD.StatementImplement> ls = new ArrayList(); }
    (d=declaration {decl = $d.out;})?
    (s=statement {ls.add($s.out);} )+ { $out = new ASD.BlockImplement(decl, ls); }
+   | {ASD.DeclarationImplement decl = null; List<ASD.StatementImplement> ls = new ArrayList(); }
+    DEBLOCK (d=declaration {decl = $d.out;})?
+    (s=statement {ls.add($s.out);} )+ FIBLOCK { $out = new ASD.BlockImplement(decl, ls); }
   ;
 
 declaration returns [ASD.DeclarationImplement out]
@@ -60,7 +61,7 @@ instruction returns [ASD.Instruction out]
     | { ASD.Block bx = null; } IF ei=expressionif THEN b=bloc (ELSE be=bloc { bx = $be.out; } )? FI { $out = new ASD.IfInstructionElse($ei.out, $b.out, bx); }
     | WHILE ew=expressionif DO bw=bloc DONE { $out = new ASD.InstructionWhile($ew.out, $bw.out); }
     //| READ r=affectable
-    | PRINT a=affichable (VIRGULE a=affichable)* { $out = new ASD.Affichable($a.out);}
+    | { List<ASD.Affichable> la = new ArrayList(); } PRINT af=affichable { la.add($af.out); } (VIRGULE as=affichable { la.add($as.out); })* { $out = new ASD.Print(la); }
     ;
 
 expressionif returns [ASD.Expression out]
@@ -92,8 +93,8 @@ factor returns [ASD.Expression out]
     ;
 
 affichable returns [ASD.Affichable out]
-	: TEXT { $out = new ASD.Affichable($TEXT.text);}
-	| IDENT { $out = new ASD.ExprIdent(new ASD.IntType(), $IDENT.text);}
+	: TEXT { $out = new ASD.AffichableImpl($TEXT.text);}
+	| p=primary { $out = new ASD.AffichableImpl($p.out);}
 	;
 
 
