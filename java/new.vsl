@@ -1,13 +1,9 @@
 FUNC INT main{
-INT x, b
+INT x
 
-x := 3 + x
-b := 0
+x := 2 + 3
 
-IF x
-THEN RETURN 4
-ELSE IF x + 2 THEN RETURN 3 FI
-FI
+PRINT "\n"
 
 RETURN x
 }

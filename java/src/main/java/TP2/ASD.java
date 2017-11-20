@@ -378,10 +378,12 @@ public class ASD {
 
         static public class RetAffichable {
             // The LLVM IR:
+            public Llvm.IR ir;
             public String name;
             public Expression expr;
 
-            public RetAffichable(String name, Expression expr) {
+            public RetAffichable(Llvm.IR ir, String name, Expression expr) {
+                this.ir = ir;
                 this.name = name;
                 this.expr = expr;
             }
@@ -756,7 +758,19 @@ public class ASD {
 
         // IR generation
         public RetInstruction toIR() throws TypeException {
+            String result = "";
+
             Llvm.IR irPrint = new Llvm.IR(Llvm.empty(), Llvm.empty());
+
+            for (Affichable a : listAffich) {
+              Affichable.RetAffichable retAffich = a.toIR();
+              irPrint.append(retAffich.ir);
+            }
+
+            Llvm.Instruction instPrint = new Llvm.Print(result);
+
+            irPrint.appendCode(instPrint);
+
             return new RetInstruction(irPrint);
         }
     }
@@ -913,11 +927,16 @@ public class ASD {
 
 
         public RetAffichable toIR() {
+
+          Llvm.IR irAffichable = new Llvm.IR(Llvm.empty(), Llvm.empty());
+
           if(expr == null){
-            return new RetAffichable(ident, null);
+            Llvm.Instruction instString = new Llvm.DecStringPrint(ident);
+            irAffichable.appendHeader(instString);
+            return new RetAffichable(irAffichable, ident, null);
           }
           else {
-            return new RetAffichable(null, expr);
+            return new RetAffichable(irAffichable, null, expr);
           }
         }
     }

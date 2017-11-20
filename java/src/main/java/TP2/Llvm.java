@@ -122,11 +122,35 @@ public class Llvm {
 
     static public class EndFunction extends Instruction {
 
-
       public EndFunction(){};
 
       public String toString() {
           return  "}";
+      }
+    }
+
+    static public class DecStringPrint extends Instruction {
+      String result;
+
+      public DecStringPrint(String result) {
+          this.result = result;
+      }
+
+      public String toString() {
+          Utils.LLVMStringConstant resTrans = Utils.stringTransform(result);
+          return "@\"" + result + "\" = global [" + resTrans.length + " x i8] c\"" + resTrans.str + "\"\n";
+      }
+    }
+
+    static public class Print extends Instruction {
+      String result;
+
+      public Print(String result) {
+          this.result = result;
+      }
+
+      public String toString() {
+          return "call i32 (i8*,...)* @printf" + result + "\n";
       }
     }
 
