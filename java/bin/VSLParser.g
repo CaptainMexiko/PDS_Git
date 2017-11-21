@@ -60,7 +60,7 @@ instruction returns [ASD.Instruction out]
     : a=affectable  AFFECT  e=expression  { $out = new ASD.AffectInstruction($a.out, $e.out); }
     | { ASD.Block bx = null; } IF ei=expressionif THEN b=bloc (ELSE be=bloc { bx = $be.out; } )? FI { $out = new ASD.IfInstructionElse($ei.out, $b.out, bx); }
     | WHILE ew=expressionif DO bw=bloc DONE { $out = new ASD.InstructionWhile($ew.out, $bw.out); }
-    //| READ r=affectable
+    //| READ ec=entreeclavier { $out = new ASD.Read($ec.out); }
     | { List<ASD.Affichable> la = new ArrayList(); } PRINT af=affichable { la.add($af.out); } (VIRGULE as=affichable { la.add($as.out); })* { $out = new ASD.Print(la); }
     ;
 
@@ -97,7 +97,10 @@ affichable returns [ASD.Affichable out]
 	| p=primary { $out = new ASD.AffichableImpl($p.out);}
 	;
 
-
+//entreeclavier returns [ASD.EntreeClavier out]
+	//: ec=affectable { $out = neww ASD.EntreeClavierImpl($ec.out);}
+	//;
+	
 affectable returns [ASD.AffectableVar out]
   : IDENT { $out = new ASD.AffectableVar(new ASD.IntType(), $IDENT.text); }
   ;

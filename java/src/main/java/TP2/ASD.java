@@ -390,6 +390,46 @@ public class ASD {
         }
     }
 
+    
+    
+    /************************************************ Read************************************************/
+
+    static public abstract class Read{
+        public abstract String pp();
+
+        public abstract RetRead toIR() throws TypeException;
+
+        static public class RetRead {
+            // The LLVM IR:
+            public Llvm.IR ir;
+            public Expression expr;
+
+            public RetRead(Llvm.IR ir, Expression expr) {
+                this.ir = ir;
+                this.expr = expr;
+            }
+        }
+    }
+    
+    /************************************************ EntreeClavier ************************************************/
+
+    static public abstract class EntreeClavier{
+        public abstract String pp();
+
+        public abstract RetEntreeClavier toIR() throws TypeException;
+
+        static public class RetEntreeClavier {
+            // The LLVM IR:
+            public Llvm.IR ir;
+            public Expression expr;
+
+            public RetEntreeClavier(Llvm.IR ir, Expression expr) {
+                this.ir = ir;
+                this.expr = expr;
+            }
+        }
+    }
+
 
     /************************************************ AddExpression ************************************************/
     // Concrete class for Expression: add case
@@ -612,6 +652,8 @@ public class ASD {
         }
     }
 
+    
+    /************************************************ ExpressionIf ************************************************/
     static public class ExpressionIf extends Expression {
         Expression expr;
 
@@ -739,6 +781,9 @@ public class ASD {
             return new RetInstruction(exprRet.ir);
         }
     }
+    
+    
+    /************************************************ Print ************************************************/
 
     static public class Print extends Instruction {
       List<Affichable> listAffich;
@@ -936,12 +981,47 @@ public class ASD {
             return new RetAffichable(irAffichable, ident, null);
           }
           else {
-            Llvm.Instruction instExpr = new Llvm.DecExprPrint(expr);
+           
             return new RetAffichable(irAffichable, null, expr);
           }
         }
     }
 
+    
+    /************************************************ EntreeClavierImpl ************************************************/
+    static public class EntreeClavierImpl extends EntreeClavier {
+     
+        Expression expr = null;
+
+
+        public EntreeClavierImpl(Expression expr){
+          this.expr = expr;
+        }
+
+        public String pp() {
+          String rep = "";
+        
+          rep = expr.pp();
+         
+          return rep;
+        }
+
+
+        public RetEntreeClavier toIR() {
+
+          Llvm.IR irAffichable = new Llvm.IR(Llvm.empty(), Llvm.empty());
+
+          if(expr == null){
+           
+            return new RetEntreeClavier (irAffichable, null);
+          }
+          else {
+           
+            return new RetEntreeClavier (irAffichable, expr);
+          }
+        }
+    }
+    
     /************************************************ AffectableVar ************************************************/
     static public class AffectableVar extends Affectable {
         Type type;
