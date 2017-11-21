@@ -805,12 +805,20 @@ public class ASD {
     /************************************************ Read************************************************/
 
     static public abstract class Read extends Instruction{
+    	Expression expr = null;
     	
-    	public Read(){
-    		
+    	public Read(Expression expr){
+    		this.expr=expr;
     		
     	}
     	
+    	public String pp() {
+            String rep = "";
+          
+            rep = expr.pp();
+           
+            return rep;
+          }
     	
     	/*public RetInstruction toIR() throws TypeException{
     		Llvm.IR irPrint = new Llvm.IR(Llvm.empty(), Llvm.empty());
