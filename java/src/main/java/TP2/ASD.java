@@ -392,24 +392,6 @@ public class ASD {
 
     
     
-    /************************************************ Read************************************************/
-
-    static public abstract class Read{
-        public abstract String pp();
-
-        public abstract RetRead toIR() throws TypeException;
-
-        static public class RetRead {
-            // The LLVM IR:
-            public Llvm.IR ir;
-            public Expression expr;
-
-            public RetRead(Llvm.IR ir, Expression expr) {
-                this.ir = ir;
-                this.expr = expr;
-            }
-        }
-    }
     
     /************************************************ EntreeClavier ************************************************/
 
@@ -820,7 +802,15 @@ public class ASD {
         }
     }
 
+    /************************************************ Read************************************************/
 
+    static public abstract class Read extends Instruction{
+    	
+    	
+       
+
+     
+    }
 
 
     /************************************************ IfInstElse ************************************************/
