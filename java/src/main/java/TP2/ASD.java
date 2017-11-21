@@ -806,6 +806,19 @@ public class ASD {
 
     static public abstract class Read extends Instruction{
     	
+    	public Read(){
+    		
+    		
+    	}
+    	
+    	
+    	/*public RetInstruction toIR() throws TypeException{
+    		Llvm.IR irPrint = new Llvm.IR(Llvm.empty(), Llvm.empty());
+    		irPrint.append();
+    		irPrint.appendCode();
+    		
+    		return new RetIntruction(irPrint);
+    	}*/
     	
        
 
