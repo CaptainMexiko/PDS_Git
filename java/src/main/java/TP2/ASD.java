@@ -785,7 +785,7 @@ public class ASD {
 
         // IR generation
         public RetInstruction toIR() throws TypeException {
-            String result = "(i8* getelementptr inbounds (";
+            String result = "(i8* getelementptr inbounds ";
             String format = "";
             List<Affichable.RetAffichable> lRet = new ArrayList<>();
 
@@ -803,7 +803,7 @@ public class ASD {
               }
             }
             Utils.LLVMStringConstant llvmFormat = Utils.stringTransform(format);
-            result = result + "(" + "[" +llvmFormat.length  + " x i8]" + ",[" + llvmFormat.length + " x i8])* @\"" + llvmFormat.str + "\", i32 0, i32 0)";
+            result = result + "([" +llvmFormat.length  + " x i8]" + ",[" + llvmFormat.length + " x i8]* @\"" + format + "\", i32 0, i32 0)";
 
             for(int i = 0; i < lRet.size() - 1; i++){
               if(lRet.get(i).affect != null){
@@ -1031,7 +1031,7 @@ public class ASD {
           String rep = "";
 
           rep = expr.pp();
-         
+
           return rep;
         }
 
