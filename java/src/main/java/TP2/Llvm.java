@@ -142,6 +142,7 @@ public class Llvm {
       }
     }
 
+
     static public class Print extends Instruction {
       String result;
 
@@ -150,7 +151,7 @@ public class Llvm {
       }
 
       public String toString() {
-          return "call i32 (i8*,...)* @printf" + result + "\n";
+          return "call i32 (i8*,...) @printf" + result + "\n";
       }
     }
 

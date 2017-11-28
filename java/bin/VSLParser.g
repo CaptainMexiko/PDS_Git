@@ -94,7 +94,7 @@ factor returns [ASD.Expression out]
 
 affichable returns [ASD.Affichable out]
 	: TEXT { $out = new ASD.AffichableImpl($TEXT.text);}
-	| p=primary { $out = new ASD.AffichableImpl($p.out);}
+	| a=affectable { $out = new ASD.AffichableImpl($a.out);}
 	;
 
 

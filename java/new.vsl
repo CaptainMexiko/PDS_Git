@@ -1,9 +1,10 @@
 FUNC INT main{
-INT x
+INT x, b
 
 x := 2 + 3
+b := 0
 
-PRINT "\n"
+PRINT "x vaut : ", x
 
 RETURN x
 }

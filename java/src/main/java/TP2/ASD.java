@@ -380,12 +380,12 @@ public class ASD {
             // The LLVM IR:
             public Llvm.IR ir;
             public String name;
-            public Expression expr;
+            public Affectable affect;
 
-            public RetAffichable(Llvm.IR ir, String name, Expression expr) {
+            public RetAffichable(Llvm.IR ir, String name, Affectable affect) {
                 this.ir = ir;
                 this.name = name;
-                this.expr = expr;
+                this.affect = affect;
             }
         }
     }
@@ -741,7 +741,7 @@ public class ASD {
     }
 
     static public class Print extends Instruction {
-      List<Affichable> listAffich;
+      List<Affichable> listAffich = new ArrayList<>();
 
         public Print(List<Affichable> lA) {
             this.listAffich = lA;
@@ -758,14 +758,35 @@ public class ASD {
 
         // IR generation
         public RetInstruction toIR() throws TypeException {
-            String result = "";
+            String result = "(i8* getelementptr inbounds (";
+            String format = "";
+            List<Affichable.RetAffichable> lRet = new ArrayList<>();
 
             Llvm.IR irPrint = new Llvm.IR(Llvm.empty(), Llvm.empty());
 
             for (Affichable a : listAffich) {
               Affichable.RetAffichable retAffich = a.toIR();
-              irPrint.append(retAffich.ir);
+              lRet.add(retAffich);
+              if(retAffich.name != null){
+                irPrint.append(retAffich.ir);
+                format = format + retAffich.name;
+              }
+              else {
+                format = format + "%d";
+              }
             }
+            Utils.LLVMStringConstant llvmFormat = Utils.stringTransform(format);
+            result = result + "(" + "[" +llvmFormat.length  + " x i8]" + ",[" + llvmFormat.length + " x i8])* @\"" + llvmFormat.str + "\", i32 0, i32 0)";
+
+            for(int i = 0; i < lRet.size() - 1; i++){
+              if(lRet.get(i).affect != null){
+                Affectable.RetAffectable rslt =lRet.get(i).affect.toIR();
+                result = result + ", i32" + rslt.result;
+              }
+            }
+
+            result = result + ")";
+
 
             Llvm.Instruction instPrint = new Llvm.Print(result);
 
@@ -904,14 +925,14 @@ public class ASD {
     /************************************************ Affichable ************************************************/
     static public class AffichableImpl extends Affichable {
         String ident = null;
-        Expression expr = null;
+        Affectable affect = null;
 
         public AffichableImpl(String ident) {
             this.ident = ident;
         }
 
-        public AffichableImpl(Expression expr){
-          this.expr = expr;
+        public AffichableImpl(Affectable affect){
+          this.affect = affect;
         }
 
         public String pp() {
@@ -920,25 +941,22 @@ public class ASD {
             rep = ident;
           }
           else {
-            rep = expr.pp();
+            rep = affect.pp();
           }
             return rep;
         }
 
 
         public RetAffichable toIR() {
-
           Llvm.IR irAffichable = new Llvm.IR(Llvm.empty(), Llvm.empty());
 
-          if(expr == null){
+          if(affect == null){
+
             Llvm.Instruction instString = new Llvm.DecStringPrint(ident);
             irAffichable.appendHeader(instString);
             return new RetAffichable(irAffichable, ident, null);
           }
-          else {
-            Llvm.Instruction instExpr = new Llvm.DecExprPrint(expr);
-            return new RetAffichable(irAffichable, null, expr);
-          }
+          return new RetAffichable(irAffichable, null, affect);
         }
     }
 
