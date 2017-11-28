@@ -391,6 +391,28 @@ public class ASD {
     }
 
 
+
+
+    /************************************************ EntreeClavier ************************************************/
+
+    static public abstract class EntreeClavier{
+        public abstract String pp();
+
+        public abstract RetEntreeClavier toIR() throws TypeException;
+
+        static public class RetEntreeClavier {
+            // The LLVM IR:
+            public Llvm.IR ir;
+            public Expression expr;
+
+            public RetEntreeClavier(Llvm.IR ir, Expression expr) {
+                this.ir = ir;
+                this.expr = expr;
+            }
+        }
+    }
+
+
     /************************************************ AddExpression ************************************************/
     // Concrete class for Expression: add case
     static public class AddExpression extends Expression {
@@ -612,6 +634,8 @@ public class ASD {
         }
     }
 
+
+    /************************************************ ExpressionIf ************************************************/
     static public class ExpressionIf extends Expression {
         Expression expr;
 
@@ -740,6 +764,9 @@ public class ASD {
         }
     }
 
+
+    /************************************************ Print ************************************************/
+
     static public class Print extends Instruction {
       List<Affichable> listAffich = new ArrayList<>();
 
@@ -796,7 +823,36 @@ public class ASD {
         }
     }
 
+    /************************************************ Read************************************************/
 
+    static public abstract class Read extends Instruction{
+    	Expression expr = null;
+
+    	public Read(Expression expr){
+    		this.expr=expr;
+
+    	}
+
+    	public String pp() {
+            String rep = "";
+
+            rep = expr.pp();
+
+            return rep;
+          }
+
+    	/*public RetInstruction toIR() throws TypeException{
+    		Llvm.IR irPrint = new Llvm.IR(Llvm.empty(), Llvm.empty());
+    		irPrint.append();
+    		irPrint.appendCode();
+
+    		return new RetIntruction(irPrint);
+    	}*/
+
+
+
+
+    }
 
 
     /************************************************ IfInstElse ************************************************/
@@ -957,6 +1013,41 @@ public class ASD {
             return new RetAffichable(irAffichable, ident, null);
           }
           return new RetAffichable(irAffichable, null, affect);
+        }
+    }
+
+
+    /************************************************ EntreeClavierImpl ************************************************/
+    static public class EntreeClavierImpl extends EntreeClavier {
+
+        Expression expr = null;
+
+
+        public EntreeClavierImpl(Expression expr){
+          this.expr = expr;
+        }
+
+        public String pp() {
+          String rep = "";
+
+          rep = expr.pp();
+         
+          return rep;
+        }
+
+
+        public RetEntreeClavier toIR() {
+
+          Llvm.IR irAffichable = new Llvm.IR(Llvm.empty(), Llvm.empty());
+
+          if(expr == null){
+
+            return new RetEntreeClavier (irAffichable, null);
+          }
+          else {
+
+            return new RetEntreeClavier (irAffichable, expr);
+          }
         }
     }
 

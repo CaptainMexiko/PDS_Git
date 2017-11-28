@@ -7,7 +7,7 @@ declare i32 @printf(i8* noalias nocapture, ...)
 
 
 
-define i32 @main() {
+define i32@main(){
 ; Début block 
 %x = alloca i32
 %b = alloca i32
@@ -53,4 +53,3 @@ done6:
 ret i32 14
 ; Fin block 
 }
-

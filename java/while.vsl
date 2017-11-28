@@ -1,4 +1,5 @@
-{
+FUNC INT main{
+
 INT x, b, c
 
 x:=10
