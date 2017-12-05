@@ -23,7 +23,7 @@ program returns [ASD.Program out]
     ;
 
 function returns [ASD.Function out]
-    : { ASD.Type typeP = null; } PROTO (VOID { typeP = new ASD.VoidType(); } | DECINT { typeP = new ASD.IntType(); } ) IDENT LP RP DEBLOCK b=bloc FIBLOCK { $out = new ASD.FunctionProto(typeP, $IDENT.text, $b.out); }
+    : { ASD.Type typeP = null; } PROTO (VOID { typeP = new ASD.VoidType(); } | DECINT { typeP = new ASD.IntType(); } ) IDENT LP RP { $out = new ASD.FunctionProto(typeP, $IDENT.text); }
     | { ASD.Type typeF = null; } FUNC (VOID { typeF = new ASD.VoidType(); } | DECINT { typeF = new ASD.IntType(); } ) IDENT LP RP DEBLOCK b=bloc FIBLOCK { $out = new ASD.FunctionImplement(typeF, $IDENT.text, $b.out); } // TODO : change when you extend the language
     ;
 

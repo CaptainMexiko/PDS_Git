@@ -35,6 +35,17 @@ public class Llvm {
             return this;
         }
 
+        //Ajoute le header de l'IR dans l'header d'un autre
+        public IR addHead(IR other){
+          header.addAll(other.header);
+          return this;
+        }
+
+        public IR addCode(IR other){
+          header.addAll(other.code);
+          return this;
+        }
+
         // Final string generation
         public String toString() {
             // This header describe to LLVM the target

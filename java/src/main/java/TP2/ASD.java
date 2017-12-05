@@ -28,7 +28,7 @@ public class ASD {
             Llvm.IR irprog = new Llvm.IR(Llvm.empty(), Llvm.empty());
 
             for (Function f : lfunct) {
-              Function.RetFunction retF = f.toIR();
+              Function.RetFunction retF = f.toIR(symbolTable);
               irprog.append(retF.ir);
             }
             return irprog;
@@ -43,7 +43,7 @@ public class ASD {
 
         public abstract String pp();
 
-        public abstract RetFunction toIR() throws TypeException;
+        public abstract RetFunction toIR(SymbolTable symbolTable) throws TypeException;
 
         // Object returned by toIR on expressions, with IR + synthesized attributes
         static public class RetFunction{
@@ -73,7 +73,34 @@ public class ASD {
         }
 
         // IR generation
-        public RetFunction toIR() throws TypeException {
+        public RetFunction toIR(SymbolTable symbolTable) throws TypeException {
+          SymbolTable.FunctionSymbol symboleTableFunc = new SymbolTable.FunctionSymbol(type, ident, null, false);
+
+          if(symbolTable.lookup(symboleTableFunc.ident) != null){
+            Block.RetBlock retbloc = bloc.toIR();
+
+            Llvm.IR irFunction = new Llvm.IR(Llvm.empty(), Llvm.empty());
+            Llvm.Instruction instFunc = new Llvm.Function(type.toLlvmType(), ident);
+            Llvm.Instruction instend = new Llvm.EndFunction();
+
+            irFunction.addHead(retbloc.ir);
+            irFunction.appendHeader(instFunc);
+            irFunction.addCode(retbloc.ir);
+
+            VoidType voidType = new VoidType();
+            if(!voidType.equals(type)){
+            Type type = new IntType();
+            Llvm.Instruction irReturn = new Llvm.Return(type.toLlvmType(), "0");
+            irFunction.appendHeader(irReturn);
+          }
+          else {
+            Llvm.Instruction irReturn = new Llvm.Return(null, "void");
+            irFunction.appendHeader(irReturn);
+          }
+            irFunction.appendHeader(instend);
+           return new RetFunction(irFunction);
+          }
+          else {
           Block.RetBlock retbloc = bloc.toIR();
 
           Llvm.IR irFunction = new Llvm.IR(Llvm.empty(), Llvm.empty());
@@ -96,17 +123,16 @@ public class ASD {
           irFunction.appendCode(instend);
          return new RetFunction(irFunction);
         }
+      }
     }
 
     static public class FunctionProto extends Function {
         Type type;
         String ident;
-        BlockImplement bloc;
 
-        public FunctionProto(Type type, String ident, BlockImplement bloc) {
+        public FunctionProto(Type type, String ident) {
             this.type = type;
             this.ident = ident;
-            this.bloc = bloc;
         }
 
         // Pretty-printer
@@ -115,10 +141,10 @@ public class ASD {
         }
 
         // IR generation
-        public RetFunction toIR() throws TypeException {
+        public RetFunction toIR(SymbolTable symbolTable) throws TypeException {
           Llvm.IR irFunction = new Llvm.IR(Llvm.empty(), Llvm.empty());
-
-
+          SymbolTable.FunctionSymbol symboleTableProto = new SymbolTable.FunctionSymbol(type, ident, null, false);
+          symbolTable.add(symboleTableProto);
          return new RetFunction(irFunction);
         }
     }

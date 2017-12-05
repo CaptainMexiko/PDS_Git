@@ -6,7 +6,13 @@ declare i32 @printf(i8* noalias nocapture, ...)
 ; Actual code begins
 
 @"formatPrint1" = global [29 x i8] c"x vaut : %d mais b vaut : %d\00"
-
+@"formatPrint2" = global [5 x i8] c"test\00"
+define void @test(){
+; Début block 
+call i32 (i8*,...) @printf(i8* getelementptr inbounds ([5 x i8],[5 x i8]* @formatPrint2, i32 0, i32 0))
+; Fin block 
+ret void
+}
 
 define i32 @main(){
 ; Début block 
