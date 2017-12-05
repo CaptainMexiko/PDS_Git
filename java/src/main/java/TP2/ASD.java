@@ -380,12 +380,12 @@ public class ASD {
             // The LLVM IR:
             public Llvm.IR ir;
             public String name;
-            public Affectable affect;
+            public Expression exprIdent;
 
-            public RetAffichable(Llvm.IR ir, String name, Affectable affect) {
+            public RetAffichable(Llvm.IR ir, String name, Expression exprIdent) {
                 this.ir = ir;
                 this.name = name;
-                this.affect = affect;
+                this.exprIdent = exprIdent;
             }
         }
     }
@@ -802,21 +802,27 @@ public class ASD {
                 format = format + "%d";
               }
             }
-            Utils.LLVMStringConstant llvmFormat = Utils.stringTransform(format);
-            result = result + "([" +llvmFormat.length  + " x i8]" + ",[" + llvmFormat.length + " x i8]* @\"" + format + "\", i32 0, i32 0)";
 
-            for(int i = 0; i < lRet.size() - 1; i++){
-              if(lRet.get(i).affect != null){
-                Affectable.RetAffectable rslt =lRet.get(i).affect.toIR();
-                result = result + ", i32" + rslt.result;
+            String name = Utils.newglob("formatPrint");
+
+            Utils.LLVMStringConstant llvmFormat = Utils.stringTransform(format);
+
+            Llvm.Instruction irInstPrint = new Llvm.DecStringPrint(name, llvmFormat);
+            result = result + "([" + llvmFormat.length  + " x i8]" + ",[" + llvmFormat.length + " x i8]* @" + name + ", i32 0, i32 0)";
+
+            for(int i = 0; i < lRet.size(); i++){
+              if(lRet.get(i).exprIdent != null){
+                Expression.RetExpression rslt =lRet.get(i).exprIdent.toIR();
+                irPrint.append(rslt.ir);
+                result = result + ", " + rslt.type.toLlvmType() + " " + rslt.result;
               }
             }
 
             result = result + ")";
 
-
             Llvm.Instruction instPrint = new Llvm.Print(result);
 
+            irPrint.appendHeader(irInstPrint);
             irPrint.appendCode(instPrint);
 
             return new RetInstruction(irPrint);
@@ -842,7 +848,7 @@ public class ASD {
           }
 
     	/*
-    	 * 
+    	 *
     	 * public RetInstruction toIR() throws TypeException{
     		Llvm.IR irPrint = new Llvm.IR(Llvm.empty(), Llvm.empty());
     		irPrint.append();
@@ -850,9 +856,9 @@ public class ASD {
 
     		return new RetIntruction(irPrint);
     	}
-    	
-    	
-    	
+
+
+
     	*/
 
 
@@ -987,14 +993,14 @@ public class ASD {
     /************************************************ Affichable ************************************************/
     static public class AffichableImpl extends Affichable {
         String ident = null;
-        Affectable affect = null;
+        Expression exprIdent = null;
 
         public AffichableImpl(String ident) {
             this.ident = ident;
         }
 
-        public AffichableImpl(Affectable affect){
-          this.affect = affect;
+        public AffichableImpl(Expression exprIdent){
+          this.exprIdent = exprIdent;
         }
 
         public String pp() {
@@ -1003,7 +1009,7 @@ public class ASD {
             rep = ident;
           }
           else {
-            rep = affect.pp();
+            rep = exprIdent.pp();
           }
             return rep;
         }
@@ -1012,13 +1018,10 @@ public class ASD {
         public RetAffichable toIR() {
           Llvm.IR irAffichable = new Llvm.IR(Llvm.empty(), Llvm.empty());
 
-          if(affect == null){
-
-            Llvm.Instruction instString = new Llvm.DecStringPrint(ident);
-            irAffichable.appendHeader(instString);
+          if(exprIdent == null){
             return new RetAffichable(irAffichable, ident, null);
           }
-          return new RetAffichable(irAffichable, null, affect);
+          return new RetAffichable(irAffichable, null, exprIdent);
         }
     }
 
@@ -1080,7 +1083,7 @@ public class ASD {
 
           irConst.appendCode(constante);
 
-            return new RetAffectable(irConst, type, "" + ident);
+            return new RetAffectable(irConst, type, ident);
         }
     }
 

@@ -94,13 +94,13 @@ factor returns [ASD.Expression out]
 
 affichable returns [ASD.Affichable out]
 	: TEXT { $out = new ASD.AffichableImpl($TEXT.text);}
-	| a=affectable { $out = new ASD.AffichableImpl($a.out);}
+	| a=primary { $out = new ASD.AffichableImpl($a.out);}
 	;
 
 //entreeclavier returns [ASD.EntreeClavier out]
 	//: ec=affectable { $out = neww ASD.EntreeClavierImpl($ec.out);}
 	//;
-	
+
 affectable returns [ASD.AffectableVar out]
   : IDENT { $out = new ASD.AffectableVar(new ASD.IntType(), $IDENT.text); }
   ;

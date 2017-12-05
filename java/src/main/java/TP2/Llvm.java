@@ -116,7 +116,7 @@ public class Llvm {
       }
 
       public String toString() {
-          return "define " + type + "@" + ident + "(){" + "\n";
+          return "define " + type + " @" + ident + "(){" + "\n";
       }
     }
 
@@ -130,15 +130,16 @@ public class Llvm {
     }
 
     static public class DecStringPrint extends Instruction {
-      String result;
+      String name;
+      Utils.LLVMStringConstant result;
 
-      public DecStringPrint(String result) {
+      public DecStringPrint(String name, Utils.LLVMStringConstant result) {
+          this.name = name;
           this.result = result;
       }
 
       public String toString() {
-          Utils.LLVMStringConstant resTrans = Utils.stringTransform(result);
-          return "@\"" + result + "\" = global [" + resTrans.length + " x i8] c\"" + resTrans.str + "\"\n";
+          return "@\"" + name + "\" = global [" + result.length + " x i8] c\"" + result.str + "\"\n";
       }
     }
 

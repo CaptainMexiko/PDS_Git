@@ -5,18 +5,20 @@ declare i32 @printf(i8* noalias nocapture, ...)
 
 ; Actual code begins
 
-@"x vaut : " = global [10 x i8] c"x vaut : \00"
+@"formatPrint1" = global [29 x i8] c"x vaut : %d mais b vaut : %d\00"
 
 
-define i32@main(){
+define i32 @main(){
 ; Début block 
 %x = alloca i32
 %b = alloca i32
 %tmp1 = add i32 2, 3
 store i32 %tmp1, i32*  %x
 store i32 0, i32*  %b
-call i32 (i8*,...) @printf(i8* getelementptr inbounds ([12 x i8],[12 x i8]* @"x vaut : %d", i32 0, i32 0))
 %tmp2 = load i32, i32* %x
-ret i32 %tmp2
+%tmp3 = load i32, i32* %b
+call i32 (i8*,...) @printf(i8* getelementptr inbounds ([29 x i8],[29 x i8]* @formatPrint1, i32 0, i32 0), i32 %tmp2, i32 %tmp3)
+%tmp4 = load i32, i32* %x
+ret i32 %tmp4
 ; Fin block 
 }

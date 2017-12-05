@@ -4,7 +4,7 @@ INT x, b
 x := 2 + 3
 b := 0
 
-PRINT "x vaut : ", x
+PRINT "x vaut : ", x , " mais b vaut : ", b
 
 RETURN x
 }
