@@ -284,7 +284,12 @@ public class Llvm {
         }
 
         public String toString() {
+          if(type != null){
             return "ret " + type + " " + value + "\n";
+          }
+          else{
+            return "ret " + value + "\n";
+          }
         }
     }
 

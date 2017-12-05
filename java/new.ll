@@ -16,9 +16,11 @@ define i32 @main(){
 store i32 %tmp1, i32*  %x
 store i32 0, i32*  %b
 %tmp2 = load i32, i32* %x
-%tmp3 = load i32, i32* %b
-call i32 (i8*,...) @printf(i8* getelementptr inbounds ([29 x i8],[29 x i8]* @formatPrint1, i32 0, i32 0), i32 %tmp2, i32 %tmp3)
-%tmp4 = load i32, i32* %x
-ret i32 %tmp4
+%tmp3 = add i32 %tmp2, 4
+%tmp4 = load i32, i32* %b
+call i32 (i8*,...) @printf(i8* getelementptr inbounds ([29 x i8],[29 x i8]* @formatPrint1, i32 0, i32 0), i32 %tmp3, i32 %tmp4)
+%tmp5 = load i32, i32* %x
+ret i32 %tmp5
 ; Fin block 
+ret i32 0
 }

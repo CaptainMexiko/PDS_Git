@@ -82,8 +82,18 @@ public class ASD {
 
           irFunction.appendCode(instFunc);
           irFunction.append(retbloc.ir);
-          irFunction.appendCode(instend);
 
+          VoidType voidType = new VoidType();
+          if(!voidType.equals(type)){
+          Type type = new IntType();
+          Llvm.Instruction irReturn = new Llvm.Return(type.toLlvmType(), "0");
+          irFunction.appendCode(irReturn);
+        }
+        else {
+          Llvm.Instruction irReturn = new Llvm.Return(null, "void");
+          irFunction.appendCode(irReturn);
+        }
+          irFunction.appendCode(instend);
          return new RetFunction(irFunction);
         }
     }

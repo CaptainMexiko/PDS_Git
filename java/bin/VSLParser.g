@@ -23,8 +23,8 @@ program returns [ASD.Program out]
     ;
 
 function returns [ASD.Function out]
-    : { ASD.Type typeP = null; } PROTO (VOID { typeP = new ASD.VoidType(); } | DECINT { typeP = new ASD.IntType(); } ) IDENT DEBLOCK b=bloc FIBLOCK { $out = new ASD.FunctionProto(typeP, $IDENT.text, $b.out); }
-    | { ASD.Type typeF = null; } FUNC (VOID { typeF = new ASD.VoidType(); } | DECINT { typeF = new ASD.IntType(); } ) IDENT DEBLOCK b=bloc FIBLOCK { $out = new ASD.FunctionImplement(typeF, $IDENT.text, $b.out); } // TODO : change when you extend the language
+    : { ASD.Type typeP = null; } PROTO (VOID { typeP = new ASD.VoidType(); } | DECINT { typeP = new ASD.IntType(); } ) IDENT LP RP DEBLOCK b=bloc FIBLOCK { $out = new ASD.FunctionProto(typeP, $IDENT.text, $b.out); }
+    | { ASD.Type typeF = null; } FUNC (VOID { typeF = new ASD.VoidType(); } | DECINT { typeF = new ASD.IntType(); } ) IDENT LP RP DEBLOCK b=bloc FIBLOCK { $out = new ASD.FunctionImplement(typeF, $IDENT.text, $b.out); } // TODO : change when you extend the language
     ;
 
 bloc returns [ASD.BlockImplement out]
@@ -94,7 +94,7 @@ factor returns [ASD.Expression out]
 
 affichable returns [ASD.Affichable out]
 	: TEXT { $out = new ASD.AffichableImpl($TEXT.text);}
-	| a=primary { $out = new ASD.AffichableImpl($a.out);}
+	| e=expression { $out = new ASD.AffichableImpl($e.out);}
 	;
 
 //entreeclavier returns [ASD.EntreeClavier out]
