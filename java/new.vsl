@@ -1,5 +1,5 @@
 PROTO VOID test()
-
+PROTO VOID test2()
 FUNC INT main(){
 INT x, b
 
@@ -13,4 +13,8 @@ RETURN x
 
 FUNC VOID test(){
 PRINT "test"
+}
+
+FUNC VOID test2(){
+PRINT "coucou"
 }

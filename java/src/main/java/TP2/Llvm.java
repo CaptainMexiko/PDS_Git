@@ -41,8 +41,14 @@ public class Llvm {
           return this;
         }
 
+        //Ajoute le code de l'IR dans l'header de l'IR
         public IR addCode(IR other){
           header.addAll(other.code);
+          return this;
+        }
+
+        public IR addListHeader(List<Instruction> lI){
+          header.addAll(lI);
           return this;
         }
 
@@ -59,7 +65,7 @@ public class Llvm {
             for (Instruction inst : header)
                 r.append(inst);
 
-            r.append("\n\n");
+            r.append("\n");
 
             // We create the function main
             // TODO : remove this when you extend the language
@@ -127,7 +133,7 @@ public class Llvm {
       }
 
       public String toString() {
-          return "define " + type + " @" + ident + "(){" + "\n";
+          return "\ndefine " + type + " @" + ident + "(){" + "\n";
       }
     }
 
@@ -136,7 +142,7 @@ public class Llvm {
       public EndFunction(){};
 
       public String toString() {
-          return  "}";
+          return  "}\n";
       }
     }
 
