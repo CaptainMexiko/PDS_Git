@@ -42,6 +42,9 @@ public class Main {
             } catch (TypeException e) {
                 e.printStackTrace(); // Useful for developping, not for the ``end users''!
                 System.err.println(e.getMessage());
+            } catch (SymbolException e) {
+                e.printStackTrace(); // Useful for developping, not for the ``end users''!
+                System.err.println(e.getMessage());
             }
         } catch (IOException e) {
             e.printStackTrace();

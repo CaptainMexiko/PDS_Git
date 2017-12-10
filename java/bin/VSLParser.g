@@ -23,8 +23,8 @@ program returns [ASD.Program out]
     ;
 
 function returns [ASD.Function out]
-    : { ASD.Type typeP = null; } PROTO (VOID { typeP = new ASD.VoidType(); } | DECINT { typeP = new ASD.IntType(); } ) IDENT LP RP { $out = new ASD.FunctionProto(typeP, $IDENT.text); }
-    | { ASD.Type typeF = null; } FUNC (VOID { typeF = new ASD.VoidType(); } | DECINT { typeF = new ASD.IntType(); } ) IDENT LP RP DEBLOCK b=bloc FIBLOCK { $out = new ASD.FunctionImplement(typeF, $IDENT.text, $b.out); } // TODO : change when you extend the language
+    : { ASD.Type typeP = null; List<ASD.Affectable> lParamP = new ArrayList<>(); } PROTO (VOID { typeP = new ASD.VoidType(); } | DECINT { typeP = new ASD.IntType(); } ) IDENT LP (eP=affectable {lParamP.add($eP.out); } )* RP { $out = new ASD.FunctionProto(typeP, $IDENT.text, lParamP); }
+    | { ASD.Type typeF = null; List<ASD.Affectable> lParamF = new ArrayList<>(); } FUNC (VOID { typeF = new ASD.VoidType(); } | DECINT { typeF = new ASD.IntType(); } ) IDENT LP (eF=affectable {lParamF.add($eF.out); } )* RP DEBLOCK b=bloc FIBLOCK { $out = new ASD.FunctionImplement(typeF, $IDENT.text, $b.out, lParamF); }
     ;
 
 bloc returns [ASD.BlockImplement out]
@@ -62,6 +62,11 @@ instruction returns [ASD.Instruction out]
     | WHILE ew=expressionif DO bw=bloc DONE { $out = new ASD.InstructionWhile($ew.out, $bw.out); }
     //| READ ec=entreeclavier { $out = new ASD.Read($ec.out); }
     | { List<ASD.Affichable> la = new ArrayList(); } PRINT af=affichable { la.add($af.out); } (VIRGULE as=affichable { la.add($as.out); })* { $out = new ASD.Print(la); }
+    | c=callfunction { $out = $c.out; }
+    ;
+
+callfunction returns [ASD.CallFunc out]
+    : IDENT LP RP {$out = new ASD.CallFunc($IDENT.text); }
     ;
 
 expressionif returns [ASD.Expression out]

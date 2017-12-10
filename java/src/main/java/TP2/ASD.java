@@ -24,7 +24,7 @@ public class ASD {
         }
 
         // IR generation
-        public Llvm.IR toIR() throws TypeException {
+        public Llvm.IR toIR() throws TypeException, SymbolException {
             Llvm.IR irprog = new Llvm.IR(Llvm.empty(), Llvm.empty());
             List<Function.RetFunction> lRF = new ArrayList<>();
 
@@ -49,10 +49,11 @@ public class ASD {
         Type type;
         String ident;
         BlockImplement bloc;
+      List<Affectable> lParam;
 
         public abstract String pp();
 
-        public abstract RetFunction toIR(SymbolTable symbolTable) throws TypeException;
+        public abstract RetFunction toIR(SymbolTable symbolTable) throws TypeException, SymbolException;
 
         // Object returned by toIR on expressions, with IR + synthesized attributes
         static public class RetFunction{
@@ -71,11 +72,13 @@ public class ASD {
         Type type;
         String ident;
         BlockImplement bloc;
+        List<Affectable> lParam;
 
-        public FunctionImplement(Type type, String ident, BlockImplement bloc) {
+        public FunctionImplement(Type type, String ident, BlockImplement bloc, List<Affectable> lParam) {
             this.type = type;
             this.ident = ident;
             this.bloc = bloc;
+            this.lParam =lParam;
         }
 
         // Pretty-printer
@@ -84,14 +87,31 @@ public class ASD {
         }
 
         // IR generation
-        public RetFunction toIR(SymbolTable symbolTable) throws TypeException {
+        public RetFunction toIR(SymbolTable st) throws TypeException, SymbolException {
           SymbolTable.FunctionSymbol symboleTableFunc = new SymbolTable.FunctionSymbol(type, ident, null, false);
 
-          if(symbolTable.lookup(symboleTableFunc.ident) != null){
-            Block.RetBlock retbloc = bloc.toIR();
-
+          if(st.lookup(symboleTableFunc.ident) != null){
+            Block.RetBlock retbloc = bloc.toIR(st);
             Llvm.IR irFunction = new Llvm.IR(Llvm.empty(), Llvm.empty());
-            Llvm.Instruction instFunc = new Llvm.Function(type.toLlvmType(), ident);
+            String param = "";
+            if(!lParam.isEmpty()){
+            List<Affectable.RetAffectable> lRetParam = new ArrayList<>();
+            for (Affectable exp : lParam) {
+              lRetParam.add(exp.toIR());
+            }
+            for (int i = 0; i < lRetParam.size() - 2 ; i++ ) {
+              String p100 = " ";
+              if (Character.isLetter(lRetParam.get(i).result.charAt(0))){
+                p100 = " %";
+              }
+              param = param + lRetParam.get(i).type.toLlvmType() + p100 + lRetParam.get(i).result + ", ";
+            }
+            String p100 = " ";
+            if (Character.isLetter(lRetParam.get(lRetParam.size() - 1).result.charAt(0))){
+              p100 = " %";
+            param = param + lRetParam.get(lRetParam.size() - 1).type.toLlvmType() + p100 + lRetParam.get(lRetParam.size() - 1).result;}
+          }
+            Llvm.Instruction instFunc = new Llvm.Function(type.toLlvmType(), ident, param);
             Llvm.Instruction instend = new Llvm.EndFunction();
 
             List<Llvm.Instruction> lI = new ArrayList<>();
@@ -112,10 +132,28 @@ public class ASD {
            return new RetFunction(irFunction, lI);
           }
           else {
-          Block.RetBlock retbloc = bloc.toIR();
-
+          Block.RetBlock retbloc = bloc.toIR(st);
+          String param = "";
+          if(!lParam.isEmpty()){
+          List<Affectable.RetAffectable> lRetParam = new ArrayList<>();
+          for (Affectable exp : lParam) {
+            lRetParam.add(exp.toIR());
+          }
+          for (int i = 0; i < lRetParam.size() - 2 ; i++ ) {
+            String p100 = " ";
+            if (Character.isLetter(lRetParam.get(i).result.charAt(0))){
+              p100 = " %";
+            }
+            param = param + lRetParam.get(i).type.toLlvmType() + p100 + lRetParam.get(i).result + ", ";
+          }
+          String p100 = " ";
+          if (Character.isLetter(lRetParam.get(lRetParam.size() - 1).result.charAt(0))){
+            p100 = " %";
+          }
+          param = param + lRetParam.get(lRetParam.size() - 1).type.toLlvmType() + p100 + lRetParam.get(lRetParam.size() - 1).result;
+        }
           Llvm.IR irFunction = new Llvm.IR(Llvm.empty(), Llvm.empty());
-          Llvm.Instruction instFunc = new Llvm.Function(type.toLlvmType(), ident);
+          Llvm.Instruction instFunc = new Llvm.Function(type.toLlvmType(), ident, param);
           Llvm.Instruction instend = new Llvm.EndFunction();
 
           irFunction.appendCode(instFunc);
@@ -140,10 +178,12 @@ public class ASD {
     static public class FunctionProto extends Function {
         Type type;
         String ident;
+        List<Affectable> lParam;
 
-        public FunctionProto(Type type, String ident) {
+        public FunctionProto(Type type, String ident, List<Affectable> lParam) {
             this.type = type;
             this.ident = ident;
+            this.lParam =lParam;
         }
 
         // Pretty-printer
@@ -169,7 +209,7 @@ public class ASD {
 
         public abstract String pp();
 
-        public abstract RetBlock toIR() throws TypeException;
+        public abstract RetBlock toIR(SymbolTable st) throws TypeException, SymbolException;
 
         // Object returned by toIR on expressions, with IR + synthesized attributes
         static public class RetBlock{
@@ -205,7 +245,7 @@ public class ASD {
         }
 
         // IR generation
-        public RetBlock toIR() throws TypeException {
+        public RetBlock toIR(SymbolTable st) throws TypeException, SymbolException {
          Llvm.IR irBlock = new  Llvm.IR(Llvm.empty(), Llvm.empty());
 
          Llvm.Instruction commmentBlockD = new Llvm.Comment("Début block ");
@@ -221,7 +261,7 @@ public class ASD {
 
          for (StatementImplement si : lStatement) {
 
-          Statement.RetStatement reStat = si.toIR();
+          Statement.RetStatement reStat = si.toIR(st);
           irBlock.append(reStat.ir);
           if(si.e != null){
           lastExprRes = reStat.result;
@@ -293,7 +333,7 @@ public class ASD {
 
       public abstract String pp();
 
-      public abstract RetStatement toIR() throws TypeException;
+      public abstract RetStatement toIR(SymbolTable st) throws TypeException, SymbolException;
 
       // Object returned by toIR on expressions, with IR + synthesized attributes
       static public class RetStatement {
@@ -337,14 +377,14 @@ public class ASD {
       }
 
       // IR generation
-      public RetStatement toIR() throws TypeException {
+      public RetStatement toIR(SymbolTable st) throws TypeException, SymbolException {
         RetStatement rep = null;
         if(e != null){
           Expression.RetExpression retExpr = e.toIR();
           rep =  new RetStatement(retExpr.ir, retExpr.type, retExpr.result);
         }
         if(i != null){
-          Instruction.RetInstruction retInstr = i.toIR();
+          Instruction.RetInstruction retInstr = i.toIR(st);
           rep =  new RetStatement(retInstr.ir, null, null);
         }
         return rep;
@@ -381,7 +421,7 @@ public class ASD {
     static public abstract class Instruction{
         public abstract String pp();
 
-        public abstract RetInstruction toIR() throws TypeException;
+        public abstract RetInstruction toIR(SymbolTable st) throws TypeException, SymbolException;
 
         static public class RetInstruction {
             // The LLVM IR:
@@ -457,6 +497,36 @@ public class ASD {
                 this.expr = expr;
             }
         }
+    }
+
+    static public class CallFunc extends Instruction {
+        String name;
+
+        public CallFunc(String name) {
+            this.name = name;
+        }
+
+        // Pretty-printer
+        public String pp() {
+            return "call @" + name + "()";
+        }
+
+        // IR generation
+        public RetInstruction toIR(SymbolTable st) throws TypeException, SymbolException {
+            Llvm.IR irCallF = new Llvm.IR(Llvm.empty(), Llvm.empty());
+
+            SymbolTable.FunctionSymbol funcSymbol = (SymbolTable.FunctionSymbol) st.lookup(name);
+            if(funcSymbol == null){
+              throw new SymbolException("Erreur, la fonction " + name +" n'existe pas");
+            }
+            else{
+              Type type =funcSymbol.returnType;
+              Llvm.Instruction instCall = new Llvm.Call(type.toLlvmType(), name);
+              irCallF.appendCode(instCall);
+            }
+
+            return new RetInstruction(irCallF);
+          }
     }
 
 
@@ -757,7 +827,7 @@ public class ASD {
         }
 
         // IR generation
-        public RetInstruction toIR() throws TypeException {
+        public RetInstruction toIR(SymbolTable st) throws TypeException {
             Affectable.RetAffectable leftRet = left.toIR();
             Expression.RetExpression rightRet = right.toIR();
 
@@ -796,7 +866,7 @@ public class ASD {
         }
 
         // IR generation
-        public RetInstruction toIR() throws TypeException {
+        public RetInstruction toIR(SymbolTable st) throws TypeException {
             Expression.RetExpression exprRet = expr.toIR();
 
             // new affect instruction result = affectable := expression
@@ -831,7 +901,7 @@ public class ASD {
         }
 
         // IR generation
-        public RetInstruction toIR() throws TypeException {
+        public RetInstruction toIR(SymbolTable st) throws TypeException {
             String result = "(i8* getelementptr inbounds ";
             String format = "";
             List<Affichable.RetAffichable> lRet = new ArrayList<>();
@@ -932,7 +1002,7 @@ public class ASD {
         }
 
         // IR generation
-        public RetInstruction toIR() throws TypeException {
+        public RetInstruction toIR(SymbolTable st) throws TypeException, SymbolException {
             String labelElse = null;
             Llvm.Instruction labelelse = null;
             Block.RetBlock expr2Bloc = null;
@@ -940,10 +1010,10 @@ public class ASD {
             Llvm.IR ifIR = new Llvm.IR(Llvm.empty(), Llvm.empty());
 
             Expression.RetExpression exprRet = expr.toIR();
-            Block.RetBlock exprBloc = bloc.toIR();
+            Block.RetBlock exprBloc = bloc.toIR(st);
 
             if(this.bloc2 != null){
-            expr2Bloc = bloc2.toIR();
+            expr2Bloc = bloc2.toIR(st);
           }
 
             String labelThen = Utils.newlab("then");
@@ -1003,11 +1073,11 @@ public class ASD {
         }
 
         // IR generation
-        public RetInstruction toIR() throws TypeException {
+        public RetInstruction toIR(SymbolTable st) throws TypeException, SymbolException {
             Llvm.IR instWhile = new Llvm.IR(Llvm.empty(), Llvm.empty());
 
             Expression.RetExpression exprRet = expr.toIR();
-            Block.RetBlock exprBloc = bloc.toIR();
+            Block.RetBlock exprBloc = bloc.toIR(st);
 
             String labelWhile = Utils.newlab("while");
             String labelDo = Utils.newlab("do");

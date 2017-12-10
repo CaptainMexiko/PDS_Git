@@ -1,20 +1,5 @@
-PROTO VOID test()
-PROTO VOID test2()
 FUNC INT main(){
-INT x, b
-
-x := 2 + 3
-b := 0
-
-PRINT "x vaut : ", x + 4 , " mais b vaut : ", b
-
-RETURN x
-}
-
-FUNC VOID test(){
-PRINT "test"
-}
-
-FUNC VOID test2(){
-PRINT "coucou"
+INT x
+x := x + 2
+PRINT "x vaut : ", x
 }

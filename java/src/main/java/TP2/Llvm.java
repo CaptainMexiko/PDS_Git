@@ -52,6 +52,11 @@ public class Llvm {
           return this;
         }
 
+        public IR addListCode(List<Instruction> lI){
+          code.addAll(lI);
+          return this;
+        }
+
         // Final string generation
         public String toString() {
             // This header describe to LLVM the target
@@ -126,14 +131,16 @@ public class Llvm {
     static public class Function extends Instruction {
       Type type;
       String ident;
+      String param;
 
-      public Function(Type type, String ident) {
+      public Function(Type type, String ident, String param) {
           this.type = type;
           this.ident = ident;
+          this.param = param;
       }
 
       public String toString() {
-          return "\ndefine " + type + " @" + ident + "(){" + "\n";
+          return "\ndefine " + type + " @" + ident + "(" + param + "){" + "\n";
       }
     }
 
@@ -143,6 +150,20 @@ public class Llvm {
 
       public String toString() {
           return  "}\n";
+      }
+    }
+
+    static public class Call extends Instruction {
+      Type type;
+      String name;
+
+      public Call(Type type, String name){
+        this.type =type;
+        this.name =name;
+      };
+
+      public String toString() {
+          return  "call " + type + " @" + name + "()\n";
       }
     }
 
