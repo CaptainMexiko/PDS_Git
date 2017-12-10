@@ -1,5 +1,15 @@
-FUNC INT main(){
-INT x, b, c
-READ x , b , c
-PRINT "x vaut : ", x, " b vaut ", b , " et c vaut ", c
+PROTO VOID test()
+FUNC VOID main(){
+INT x
+x := 3
+test()
+}
+FUNC VOID test(){
+INT b
+WHILE 1 DO
+IF b THEN
+READ b
+ELSE PRINT "coucou"
+FI
+DONE
 }

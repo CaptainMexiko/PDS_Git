@@ -132,6 +132,7 @@ public class ASD {
            return new RetFunction(irFunction, lI);
           }
           else {
+          st.add(symboleTableFunc);
           Block.RetBlock retbloc = bloc.toIR(st);
           String param = "";
           if(!lParam.isEmpty()){
