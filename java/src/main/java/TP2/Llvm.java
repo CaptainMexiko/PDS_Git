@@ -65,6 +65,7 @@ public class Llvm {
                     "target triple = \"x86_64-unknown-linux-gnu\"\n" +
                     "; External declaration of the printf function\n" +
                     "declare i32 @printf(i8* noalias nocapture, ...)\n" +
+                    "declare i32 @scanf(i8* noalias nocapture, ...)\n" +
                     "\n; Actual code begins\n\n");
 
             for (Instruction inst : header)
@@ -181,6 +182,20 @@ public class Llvm {
       }
     }
 
+    static public class DecStringRead extends Instruction {
+      String head;
+      Utils.LLVMStringConstant result;
+
+      public DecStringRead(String head, Utils.LLVMStringConstant result) {
+          this.head = head;
+          this.result = result;
+      }
+
+      public String toString() {
+          return "@\"" + head + "\" = global [" + result.length + " x i8] c\"" + result.str + "\"\n";
+      }
+    }
+
 
     static public class Print extends Instruction {
       String result;
@@ -194,7 +209,17 @@ public class Llvm {
       }
     }
 
+    static public class Read extends Instruction {
+      String result;
 
+      public Read(String result) {
+          this.result = result;
+      }
+
+      public String toString() {
+          return "call i32 (i8*,...) @scanf" + result + "\n";
+      }
+    }
 
 /************************************************ Label ************************************************/
     static public class Label extends Instruction {

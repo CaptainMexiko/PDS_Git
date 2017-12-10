@@ -478,26 +478,8 @@ public class ASD {
     }
 
 
+/************************************************ CallFunction ************************************************/
 
-
-    /************************************************ EntreeClavier ************************************************/
-
-    static public abstract class EntreeClavier{
-        public abstract String pp();
-
-        public abstract RetEntreeClavier toIR() throws TypeException;
-
-        static public class RetEntreeClavier {
-            // The LLVM IR:
-            public Llvm.IR ir;
-            public Expression expr;
-
-            public RetEntreeClavier(Llvm.IR ir, Expression expr) {
-                this.ir = ir;
-                this.expr = expr;
-            }
-        }
-    }
 
     static public class CallFunc extends Instruction {
         String name;
@@ -948,39 +930,52 @@ public class ASD {
 
     /************************************************ Read************************************************/
 
-    static public abstract class Read extends Instruction{
-    	Expression expr = null;
+    static public class Read extends Instruction{
+    	List<Affectable> lA;
 
-    	public Read(Expression expr){
-    		this.expr=expr;
-
+    	public Read(List<Affectable> lA){
+    		this.lA = lA;
     	}
 
     	public String pp() {
             String rep = "";
-
-            rep = expr.pp();
-
+            for (Affectable a : lA) {
+                rep = rep + a.pp();
+            }
             return rep;
           }
 
-    	/*
-    	 *
-    	 * public RetInstruction toIR() throws TypeException{
-    		Llvm.IR irPrint = new Llvm.IR(Llvm.empty(), Llvm.empty());
-    		irPrint.append();
-    		irPrint.appendCode();
+    	  public RetInstruction toIR(SymbolTable st) throws TypeException{
+    		Llvm.IR irRead = new Llvm.IR(Llvm.empty(), Llvm.empty());
+        String result = "(i8* getelementptr inbounds ";
+        String format = "";
+        List<Affectable.RetAffectable> lRet = new ArrayList<>();
 
-    		return new RetIntruction(irPrint);
+        for (Affectable affectable : lA) {
+          Affectable.RetAffectable retA = affectable.toIR();
+          lRet.add(retA);
+          format = format + "%d";
+        }
+
+        Utils.LLVMStringConstant llvmFormat = Utils.stringTransform(format);
+
+
+        String head = Utils.newglob("formatRead");
+        Llvm.Instruction irInstRead = new Llvm.DecStringRead(head, llvmFormat);
+
+        result = result + "([" + llvmFormat.length  + " x i8]" + ",[" + llvmFormat.length + " x i8]* @" + head + ", i32 0, i32 0)";
+
+        for(int i = 0; i < lRet.size(); i++){
+            result = result + ", " + lRet.get(i).type.toLlvmType() + "* %" + lRet.get(i).result;
+          }
+
+        result = result + ")";
+
+        Llvm.Instruction instRead = new Llvm.Read(result);
+        irRead.appendHeader(irInstRead);
+        irRead.appendCode(instRead);
+    		return new RetInstruction(irRead);
     	}
-
-
-
-    	*/
-
-
-
-
     }
 
 
@@ -1143,39 +1138,6 @@ public class ASD {
     }
 
 
-    /************************************************ EntreeClavierImpl ************************************************/
-    static public class EntreeClavierImpl extends EntreeClavier {
-
-        Expression expr = null;
-
-
-        public EntreeClavierImpl(Expression expr){
-          this.expr = expr;
-        }
-
-        public String pp() {
-          String rep = "";
-
-          rep = expr.pp();
-
-          return rep;
-        }
-
-
-        public RetEntreeClavier toIR() {
-
-          Llvm.IR irAffichable = new Llvm.IR(Llvm.empty(), Llvm.empty());
-
-          if(expr == null){
-
-            return new RetEntreeClavier (irAffichable, null);
-          }
-          else {
-
-            return new RetEntreeClavier (irAffichable, expr);
-          }
-        }
-    }
 
     /************************************************ AffectableVar ************************************************/
     static public class AffectableVar extends Affectable {

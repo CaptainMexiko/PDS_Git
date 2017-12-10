@@ -1,5 +1,5 @@
 FUNC INT main(){
-INT x
-x := x + 2
-PRINT "x vaut : ", x
+INT x, b, c
+READ x , b , c
+PRINT "x vaut : ", x, " b vaut ", b , " et c vaut ", c
 }
