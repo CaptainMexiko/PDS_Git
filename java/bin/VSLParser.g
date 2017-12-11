@@ -57,7 +57,7 @@ instructionreturn returns [ASD.Instruction out]
   ;
 
 instruction returns [ASD.Instruction out]
-    : a=affectable  AFFECT  e=expression  { $out = new ASD.AffectInstruction($a.out, $e.out); }
+    : a=affectable  AFFECT  (e=expression  { $out = new ASD.AffectInstruction($a.out, $e.out); } | c=callfunction { $out = new ASD.AffectCall($a.out, $c.out); } )
     | { ASD.Block bx = null; } IF ei=expressionif THEN b=bloc (ELSE be=bloc { bx = $be.out; } )? FI { $out = new ASD.IfInstructionElse($ei.out, $b.out, bx); }
     | WHILE ew=expressionif DO bw=bloc DONE { $out = new ASD.InstructionWhile($ew.out, $bw.out); }
     | { List<ASD.Affectable> lA = new ArrayList(); } READ ec=affectable { lA.add($ec.out); } (VIRGULE es=affectable { lA.add($es.out); } )* { $out = new ASD.Read(lA); }

@@ -1,15 +1,11 @@
-PROTO VOID test()
+PROTO INT test()
 FUNC VOID main(){
 INT x
-x := 3
-test()
+x := test()
+PRINT x
 }
-FUNC VOID test(){
+FUNC INT test(){
 INT b
-WHILE 1 DO
-IF b THEN
 READ b
-ELSE PRINT "coucou"
-FI
-DONE
+RETURN b
 }

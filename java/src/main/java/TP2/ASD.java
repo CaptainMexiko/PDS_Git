@@ -512,6 +512,40 @@ public class ASD {
           }
     }
 
+    static public class AffectCall extends Instruction {
+        Affectable affectable;
+        CallFunc call;
+
+        public AffectCall(Affectable affectable, CallFunc call) {
+            this.affectable = affectable;
+            this.call = call;
+        }
+
+        // Pretty-printer
+        public String pp() {
+            return "%" + affectable.pp() + " = " + "call @" + call.name + "()";
+        }
+
+        // IR generation
+        public RetInstruction toIR(SymbolTable st) throws TypeException, SymbolException {
+            Llvm.IR irCallF = new Llvm.IR(Llvm.empty(), Llvm.empty());
+
+            SymbolTable.FunctionSymbol funcSymbol = (SymbolTable.FunctionSymbol) st.lookup(call.name);
+            if(funcSymbol == null){
+              throw new SymbolException("Erreur, la fonction " + call.name +" n'existe pas");
+            }
+            else{
+              Type type =funcSymbol.returnType;
+              Affectable.RetAffectable retAff = affectable.toIR();
+              String result = Utils.newtmp();
+              Type typeInter = new IntType();
+              Llvm.Instruction instCall = new Llvm.AffectCall(result, type.toLlvmType(), call.name, retAff.result, typeInter.toLlvmType(), retAff.type.toLlvmType());
+              irCallF.appendCode(instCall);
+            }
+            return new RetInstruction(irCallF);
+          }
+    }
+
 
     /************************************************ AddExpression ************************************************/
     // Concrete class for Expression: add case

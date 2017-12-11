@@ -168,6 +168,30 @@ public class Llvm {
       }
     }
 
+    static public class AffectCall extends Instruction {
+      String result;
+      Type type;
+      String name;
+      String resultfinale;
+      Type typeInter;
+      Type resFinal;
+
+      public AffectCall(String result, Type type, String name, String rF, Type typeInter, Type resFinal){
+        this.result =result;
+        this.type =type;
+        this.name =name;
+        this.resultfinale = rF;
+        this.typeInter = typeInter;
+        this.resFinal =resFinal;
+
+      };
+
+      public String toString() {
+          return  result + " = call " + type + " @" + name + "()\n"
+          + "store " + typeInter + " " + result + ", " + resFinal + "* %" + resultfinale + "\n";
+      }
+    }
+
     static public class DecStringPrint extends Instruction {
       String name;
       Utils.LLVMStringConstant result;
